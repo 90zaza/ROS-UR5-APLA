@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://ros.org/wiki/xacro" name="ur5_apla_with_printhead">
+
+  <!-- ur5 -->
+  <xacro:include filename="$(find ur5_apla)/urdf/ur5_apla.xacro" />
+  <!-- end-effector -->
+  <xacro:include filename="$(find ur5_apla)/urdf/printhead.xacro" />
+
+  <!-- end-effector -->
+  <xacro:printhead prefix="" connected_to="tool0"/>
+
+  <!-- define the ur5's position and orientation in the world coordinate system -->
+  <!--link name="world" />
+  <joint name="world_joint" type="fixed">
+    <parent link="world" />
+    <child link="base_link" />
+    <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0" />
+  </joint>-->
+</robot>

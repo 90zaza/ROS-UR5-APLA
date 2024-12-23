@@ -1,0 +1,8 @@
+prefix=/home/tim/FDMPrinting/devel
+
+Name: ur5_al
+Description: Description of ur5_al
+Version: 0.3.0
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: 
