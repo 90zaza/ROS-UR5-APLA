@@ -110,7 +110,7 @@
     <param name="planning_scene_monitor/publish_transforms_updates" value="$(arg publish_monitored_planning_scene)" />
   </node>
   
-  <!-- <node name="move_group_world" pkg="ur5_apla_moveit_config" type="world_constraints.py" respawn="false" output="screen">
-  </node> -->
+  <node name="move_group_world" pkg="ur5_apla_moveit_config" type="world_constraints.py" respawn="false" output="screen">
+  </node>
 
 </launch>
