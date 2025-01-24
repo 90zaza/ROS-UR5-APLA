@@ -14,3 +14,6 @@ catkin_install_python(PROGRAMS scripts/world_constraints.py
 catkin_install_python(PROGRAMS scripts/toolpath_plan.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
+catkin_install_python(PROGRAMS scripts/z-calibration.py
+  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
