@@ -7,6 +7,7 @@
 subdirs("gtest")
 subdirs("universal_robot/universal_robots")
 subdirs("ur5_apla_moveit_config")
+subdirs("duet3_control")
 subdirs("universal_robot/ur10_moveit_config")
 subdirs("universal_robot/ur10e_moveit_config")
 subdirs("universal_robot/ur16e_moveit_config")
