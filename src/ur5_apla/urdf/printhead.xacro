@@ -14,7 +14,7 @@
       <visual>
         <geometry>
           <!-- The path to the visual meshes in the package. -->
-          <mesh filename="package://ur5_apla/meshes/printhead/visual/printhead.stl"/>
+          <mesh filename="package://ur5_apla/meshes/printhead/visual/printhead.dae"/>
         </geometry>
       </visual>
       <collision>
@@ -27,7 +27,7 @@
 
     <!-- TCP frame -->
     <joint name="${prefix}tcp_joint" type="fixed">
-      <origin xyz="0 0 0.116" rpy="0 0 0"/>
+      <origin xyz="0 0 0.19515" rpy="0 0 0"/>
       <parent link="${prefix}printhead"/>
       <child link="${prefix}tcp"/>
     </joint>
