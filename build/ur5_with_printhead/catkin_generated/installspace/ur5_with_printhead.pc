@@ -1,8 +1,0 @@
-prefix=/home/tim/FDMPrinting/install
-
-Name: ur5_with_printhead
-Description: Description of ur5_with_printhead
-Version: 0.0.0
-Cflags: 
-Libs: -L${prefix}/lib 
-Requires: 
