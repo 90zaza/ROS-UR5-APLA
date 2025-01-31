@@ -9,8 +9,8 @@ class HttpClientNode:
         rospy.init_node('http_client_node', anonymous=True)
         self.url = rospy.get_param('~server_url', 'http://172.19.126.242')
         
-        # self.command_sub = rospy.Subscriber('http_command', String, self.send_request)
-        self.response_pub = rospy.Publisher('http_response', String, queue_size=10)
+        self.response_pub = rospy.Publisher('duet_response', String, queue_size=10)
+        self.command_sub = rospy.Subscriber('gcode_movement', String, self.send_request)
         self.server = rospy.Service('trigger_request', Trigger, self.handle_trigger)
         
         rospy.loginfo("HTTP Client Node Started. Listening for commands.")
@@ -34,9 +34,7 @@ class HttpClientNode:
             return TriggerResponse(success=False, message=str(e))
     
     def run(self):
-        while not rospy.is_shutdown():
-            user_input = input("Enter command to send: ")
-            self.send_request(user_input)
+        rospy.spin()
         
 if __name__ == '__main__':
     try:
