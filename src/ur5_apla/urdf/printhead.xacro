@@ -26,8 +26,9 @@
     </link>
 
     <!-- TCP frame -->
+    <!-- TCP is at 0.19515m according to .STL, after measuring appears to be 0.00286m further away -->
     <joint name="${prefix}tcp_joint" type="fixed">
-      <origin xyz="0 0 0.19515" rpy="0 0 0"/>
+      <origin xyz="0 0 0.19801" rpy="0 0 0"/>
       <parent link="${prefix}printhead"/>
       <child link="${prefix}tcp"/>
     </joint>
