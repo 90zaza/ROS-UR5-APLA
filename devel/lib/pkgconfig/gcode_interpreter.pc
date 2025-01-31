@@ -1,0 +1,8 @@
+prefix=/home/tim/FDMPrinting/devel
+
+Name: gcode_interpreter
+Description: Description of gcode_interpreter
+Version: 0.0.0
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: 

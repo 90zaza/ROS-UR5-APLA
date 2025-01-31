@@ -1,2 +1,2 @@
-duet3_control:ur5_apla:ur5_apla_moveit_config
+duet3_control:gcode_interpreter:ur5_apla:ur5_apla_moveit_config
 -DCATKIN_DEVEL_PREFIX=/home/tim/FDMPrinting/devel -DCMAKE_INSTALL_PREFIX=/home/tim/FDMPrinting/install -G Unix Makefiles
