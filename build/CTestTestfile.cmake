@@ -7,4 +7,5 @@
 subdirs("gtest")
 subdirs("ur5_apla_moveit_config")
 subdirs("duet3_control")
+subdirs("gcode_interpreter")
 subdirs("ur5_apla")

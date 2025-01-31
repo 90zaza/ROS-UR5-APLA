@@ -56,6 +56,7 @@ CMAKE_BINARY_DIR = /home/tim/FDMPrinting/build
 all: gtest/all
 all: ur5_apla_moveit_config/all
 all: duet3_control/all
+all: gcode_interpreter/all
 all: ur5_apla/all
 
 .PHONY : all
@@ -64,6 +65,7 @@ all: ur5_apla/all
 preinstall: gtest/preinstall
 preinstall: ur5_apla_moveit_config/preinstall
 preinstall: duet3_control/preinstall
+preinstall: gcode_interpreter/preinstall
 preinstall: ur5_apla/preinstall
 
 .PHONY : preinstall
@@ -77,6 +79,7 @@ clean: CMakeFiles/download_extra_data.dir/clean
 clean: gtest/clean
 clean: ur5_apla_moveit_config/clean
 clean: duet3_control/clean
+clean: gcode_interpreter/clean
 clean: ur5_apla/clean
 
 .PHONY : clean
@@ -112,6 +115,24 @@ duet3_control/clean: duet3_control/CMakeFiles/roscpp_generate_messages_lisp.dir/
 duet3_control/clean: duet3_control/CMakeFiles/rosgraph_msgs_generate_messages_py.dir/clean
 
 .PHONY : duet3_control/clean
+
+#=============================================================================
+# Directory level rules for directory gcode_interpreter
+
+# Recursive "all" directory target.
+gcode_interpreter/all:
+
+.PHONY : gcode_interpreter/all
+
+# Recursive "preinstall" directory target.
+gcode_interpreter/preinstall:
+
+.PHONY : gcode_interpreter/preinstall
+
+# Recursive "clean" directory target.
+gcode_interpreter/clean:
+
+.PHONY : gcode_interpreter/clean
 
 #=============================================================================
 # Directory level rules for directory gtest

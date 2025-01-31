@@ -444,6 +444,12 @@ dynamic_reconfigure_DIR:PATH=/opt/ros/noetic/share/dynamic_reconfigure/cmake
 //The directory containing a CMake configuration file for eigen_stl_containers.
 eigen_stl_containers_DIR:PATH=/opt/ros/noetic/share/eigen_stl_containers/cmake
 
+//Value Computed by CMake
+gcode_interpreter_BINARY_DIR:STATIC=/home/tim/FDMPrinting/build/gcode_interpreter
+
+//Value Computed by CMake
+gcode_interpreter_SOURCE_DIR:STATIC=/home/tim/FDMPrinting/src/gcode_interpreter
+
 //The directory containing a CMake configuration file for gencpp.
 gencpp_DIR:PATH=/opt/ros/noetic/share/gencpp/cmake
 
@@ -570,6 +576,9 @@ realtime_tools_DIR:PATH=/opt/ros/noetic/share/realtime_tools/cmake
 
 //The directory containing a CMake configuration file for robot_state_publisher.
 robot_state_publisher_DIR:PATH=/opt/ros/noetic/share/robot_state_publisher/cmake
+
+//The directory containing a CMake configuration file for rosccp.
+rosccp_DIR:PATH=rosccp_DIR-NOTFOUND
 
 //The directory containing a CMake configuration file for rosconsole.
 rosconsole_DIR:PATH=/opt/ros/noetic/share/rosconsole/cmake
@@ -955,7 +964,7 @@ CMAKE_MODULE_LINKER_FLAGS_RELWITHDEBINFO-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_NM
 CMAKE_NM-ADVANCED:INTERNAL=1
 //number of local generators
-CMAKE_NUMBER_OF_MAKEFILES:INTERNAL=7
+CMAKE_NUMBER_OF_MAKEFILES:INTERNAL=8
 //ADVANCED property for variable: CMAKE_OBJCOPY
 CMAKE_OBJCOPY-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_OBJDUMP
