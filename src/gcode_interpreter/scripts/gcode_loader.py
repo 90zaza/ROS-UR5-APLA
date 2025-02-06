@@ -8,24 +8,28 @@ def publish_gcode_lines(file_path):
     movement_pub = rospy.Publisher('gcode_movement', String, queue_size=10)
     printing_pub = rospy.Publisher('gcode_printing', String, queue_size=10)
 
-    rate = rospy.Rate(10)  # 10 Hz
-
+    # Wait for the HTTP client node (or any subscriber) to connect on gcode_movement
     while movement_pub.get_num_connections() == 0:
-        rospy.logwarn("Waiting for subscribers to connect...")
+        rospy.logwarn("Waiting for subscribers to connect on 'gcode_movement'...")
         rospy.sleep(1)
     
     try:
         with open(file_path, 'r') as file:
             for line in file:
-                line = line.strip()
-                if not line:
+                command = line.strip()
+                if not command:
                     continue
                 
-                rospy.loginfo(f"Publishing: {line}")
-                movement_pub.publish(line)
-                printing_pub.publish(line)
+                rospy.loginfo(f"Publishing: {command}")
+                movement_pub.publish(command)
+                printing_pub.publish(command)
                 
-                rate.sleep()
+                rospy.loginfo("Waiting for reply from server on 'duet_publisher'...")
+                # This will block until a message is received on the 'duet_publisher' topic.
+                reply = rospy.wait_for_message("duet_publisher", String)
+                rospy.loginfo(f"Received reply: {reply.data}")
+                
+        rospy.loginfo("Finished processing G-code file.")
     except Exception as e:
         rospy.logerr(f"Error reading file: {e}")
 
