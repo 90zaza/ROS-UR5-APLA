@@ -20,10 +20,12 @@ class topicPublisher:
 
     def publish_gcode_lines(self, movementCommand, printingCommand):
         rospy.loginfo(f"Publishing: {movementCommand} on 'gcode_movement'")
-        rospy.loginfo(f"Publishing: {printingCommand} on 'gcode_printing'")
+        # rospy.loginfo(f"Publishing: {printingCommand} on 'gcode_printing'")
 
         self.movement_pub.publish(movementCommand)
         self.printing_pub.publish(printingCommand)
+
+        # rospy.sleep(0.5)
 
         return
 
@@ -64,7 +66,7 @@ class gcodeInterpreter:
         
         printing_string = " ".join(remaining_params)
         
-        if xyz_found:
+        if xyz_found or comment == "End of Gcode":
             movementCommand = {
                 "command": command_number,
                 "line": line_number,
