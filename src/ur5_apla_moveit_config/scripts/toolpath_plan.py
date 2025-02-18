@@ -2,10 +2,11 @@
 import rospy
 import copy
 import json
-import geometry_msgs.msg
-import moveit_commander as mc
+import std_msgs.msg
 import moveit_msgs.msg
 import sensor_msgs.msg
+import geometry_msgs.msg
+import moveit_commander as mc
 from math import pi
 from std_msgs.msg import String
 from tf.transformations import quaternion_from_euler
@@ -21,6 +22,7 @@ class toolpathPlan:
 
         self.move_group.set_pose_reference_frame('buildPlate')
         self.move_group.limit_max_cartesian_link_speed(0.3, link_name='tcp')
+        self.move_group.set_max_acceleration_scaling_factor(0.1)
 
         # initialize standard position robotic arm
         self.pose_goal = geometry_msgs.msg.Pose()
@@ -33,7 +35,26 @@ class toolpathPlan:
         self.pose_goal.orientation.z = self.quaternion[2]
         self.pose_goal.orientation.w = self.quaternion[3]
 
+        self.joint_state = sensor_msgs.msg.JointState()
+        self.robot_state = moveit_msgs.msg.RobotState()
+
+        self.joint_state.header = std_msgs.msg.Header()
+        self.joint_state.header.stamp = rospy.Time.now()
+        self.joint_state.name = ['shoulder_pan_joint',
+                            'shoulder_lift_joint',
+                            'elbow_joint',
+                            'wrist_1_joint',
+                            'wrist_2_joint',
+                            'wrist_3_joint']
+
         self.trajectory_list = []
+        self.last_time = rospy.Duration(0)
+
+        self.display_trajectory_publisher = rospy.Publisher('/move_group/display_planned_path',
+                                            moveit_msgs.msg.DisplayTrajectory,
+                                            queue_size=20)
+        self.display_trajectory = moveit_msgs.msg.DisplayTrajectory()
+        self.display_trajectory.trajectory_start = self.robot.get_current_state()
 
         return
     
@@ -67,39 +88,51 @@ class toolpathPlan:
         return
     
     def computePlan(self):
-        (plan, fraction) = self.move_group.compute_cartesian_path(
-                                       [copy.deepcopy(self.pose_goal)],  # waypoints to follow
-                                       0.01,        # eef_step
-                                       False)       # jump_threshold
+        (self.plan, self.fraction) = self.move_group.compute_cartesian_path(
+                                       [copy.deepcopy(self.pose_goal)],
+                                       0.01,
+                                       False)
         
-        latest_joint_positions = copy.deepcopy(plan).joint_trajectory.points[-1].positions  # Extract joint values
-
-        self.robot_state = moveit_msgs.msg.RobotState()
-        self.robot_state.joint_state = sensor_msgs.msg.JointState()
-        
-        self.robot_state.joint_state.name = self.move_group.get_joints()[1:7] 
-        
-        self.robot_state.joint_state.position = list(latest_joint_positions)
+        self.latest_joint_positions = copy.deepcopy(self.plan).joint_trajectory.points[-1].positions
+        self.joint_state.position = copy.deepcopy(self.latest_joint_positions)
+        self.robot_state.joint_state = copy.deepcopy(self.joint_state)
         self.move_group.set_start_state(copy.deepcopy(self.robot_state))
         
-        if fraction > 0:  # Only add the plan if it is valid
-            self.trajectory_list.append(copy.deepcopy(plan))
-
-        return
+        if self.fraction > 0:
+            for point in self.plan.joint_trajectory.points:
+                if point.time_from_start.to_sec() == 0:
+                    point.time_from_start += rospy.Duration(nsecs=1)
+                point.time_from_start += self.last_time
+            
+            self.last_time = self.plan.joint_trajectory.points[-1].time_from_start
+            self.trajectory_list.append(copy.deepcopy(self.plan))
     
     def showPlan(self):
-        self.display_trajectory_publisher = rospy.Publisher('/move_group/display_planned_path',
-                                            moveit_msgs.msg.DisplayTrajectory,
-                                            queue_size=20)
-        self.display_trajectory = moveit_msgs.msg.DisplayTrajectory()
-        self.display_trajectory.trajectory_start = self.robot.get_current_state()
+        print('Displaying trajectory!')
+        print(len(self.trajectory_list))
 
         for plan in self.trajectory_list:
             self.display_trajectory.trajectory.append(plan)
 
+        print(self.display_trajectory)
         self.display_trajectory_publisher.publish(self.display_trajectory)
 
-        return
+        input("Press Enter to execute the trajectory...")
+        self.executePlan()
+
+    def executePlan(self):
+        if not self.trajectory_list:
+            print("No trajectory to execute!")
+            return
+        
+        full_trajectory = moveit_msgs.msg.RobotTrajectory()
+        for plan in self.trajectory_list:
+            full_trajectory.joint_trajectory.points.extend(plan.joint_trajectory.points)
+            if not full_trajectory.joint_trajectory.joint_names:
+                full_trajectory.joint_trajectory.joint_names = plan.joint_trajectory.joint_names
+        
+        self.move_group.execute(full_trajectory, wait=True)
+        print("Trajectory execution completed!")
 
 if __name__ == '__main__':
     toolpathPlan = toolpathPlan()
