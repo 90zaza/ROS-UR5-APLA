@@ -72,3 +72,7 @@ if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_
   file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/ur5_apla_moveit_config" TYPE PROGRAM FILES "/home/tim/FDMPrinting/build/ur5_apla_moveit_config/catkin_generated/installspace/z-calibration.py")
 endif()
 
+if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/ur5_apla_moveit_config" TYPE PROGRAM FILES "/home/tim/FDMPrinting/build/ur5_apla_moveit_config/catkin_generated/installspace/singlePose.py")
+endif()
+

@@ -2,10 +2,12 @@ import sys
 import rospy
 import moveit_commander as mc
 import moveit_msgs.msg
-import yaml
+import geometry_msgs.msg
+from tf.transformations import quaternion_from_euler
 from math import pi
      
 def go_to_home():
+  move_group.set_pose_reference_frame('world')
   joint_goal = move_group.get_current_joint_values()
   joint_goal[0] = pi/2
   joint_goal[1] = -pi/2
@@ -19,27 +21,27 @@ def go_to_home():
 
   return
 
-def get_zposition(zpos):
-  current_pose = move_group.get_current_pose().pose
-  print(current_pose.position.z)
-  zpos.append(current_pose.position.z)
+def go_to_position(x_pos, y_pos):
+  move_group.set_max_velocity_scaling_factor(0.1)
+  move_group.set_max_acceleration_scaling_factor(0.5)
+
+  move_group.set_pose_reference_frame('buildPlate')
+  pose_goal = geometry_msgs.msg.Pose()
+  pose_goal.position.x = x_pos
+  pose_goal.position.y = y_pos
+  pose_goal.position.z = 0
+  
+  quaternion = quaternion_from_euler(pi, 0, pi)
+
+  pose_goal.orientation.x = quaternion[0]
+  pose_goal.orientation.y = quaternion[1]
+  pose_goal.orientation.z = quaternion[2]
+  pose_goal.orientation.w = quaternion[3]
+
+  move_group.go(pose_goal, wait=True)
+  move_group.stop()
 
   return
-
-def calcluate_offset(zpos):
-  offset = (sum(zpos) / len(zpos)) - 0.002
-  print("The mean offset is: ", offset)
-
-  with open('/home/tim/FDMPrinting/src/ur5_apla_moveit_config/config/calibration.yaml') as f:
-    doc = yaml.load(f)
-
-  doc['calibration']['z'] = offset
-
-  with open('/home/tim/FDMPrinting/src/ur5_apla_moveit_config/config/calibration.yaml', 'w') as f:
-    yaml.dump(doc, f)
-
-  return
-
 
 def main():
   try:
@@ -53,20 +55,31 @@ def main():
     
     go_to_home()
 
-    print ("First instance: Move the TCP to the printbed, press 'Enter' once done")
-    input()
-    get_zposition(zpos)
-    go_to_home()
+    print ("Now we start the calibration")
+    go_to_position(-0.02, -0.02)
 
-    print ("Second instance: Move the TCP to the printbed, press 'Enter' once done")
+    print ("Adjust the first corner, press Enter once done")
     input()
-    get_zposition(zpos)
     go_to_home()
+    go_to_position(0.32, -0.02)
 
-    print ("Third instance: Move the TCP to the printbed, press 'Enter' once done")
+    print ("Adjust the second corner")
     input()
-    get_zposition(zpos)
-    calcluate_offset(zpos)
+    go_to_home()
+    go_to_position(0.32, 0.32)
+
+    print ("Adjust the third corner")
+    input()
+    go_to_home()
+    go_to_position(-0.02, 0.32)
+
+    print ("Adjust the fourth corner")
+    input()
+    go_to_home()
+    go_to_position(0.15, 0.15)
+
+    print ("Check for the center of the bed")
+    input()
     go_to_home()
 
     print ("============ Calibration complete!")
@@ -86,5 +99,4 @@ if __name__ == '__main__':
                                                   moveit_msgs.msg.DisplayTrajectory,
                                                   queue_size=20)
   
-  zpos = []
   main()

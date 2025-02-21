@@ -2,15 +2,25 @@
 
 import sys
 import rospy
+import tf
+import yaml
 import moveit_commander as mc
 from geometry_msgs.msg import PoseStamped, Pose, Point, Quaternion
 from std_msgs.msg import Header
+from math import pi
 
 if __name__ == '__main__':
     mc.roscpp_initialize(sys.argv) 
     rospy.init_node("ur5_apla_workcell", anonymous=True)
     robot = mc.RobotCommander()
     psi = mc.PlanningSceneInterface()
+    br = tf.TransformBroadcaster()
+    rate = rospy.Rate(10.0)
+
+    with open('/home/tim/FDMPrinting/src/ur5_apla_moveit_config/config/calibration.yaml') as f:
+        doc = yaml.load(f, Loader=yaml.FullLoader)
+
+    buildPlate = doc['calibration']['plate']
     
     # rospy.sleep(1)
 
@@ -40,35 +50,35 @@ if __name__ == '__main__':
         name="build_plate",
         pose=PoseStamped(
             header=Header(frame_id=robot.get_planning_frame()),
-            pose=Pose(position=Point(x=0, y=0.5, z=0.001), orientation=Quaternion(x=0, y=0, z=0, w=1))),
-        size=(0.54, 0.40, 0.002))
+            pose=Pose(position=Point(x=0, y=0.5, z=buildPlate/2), orientation=Quaternion(x=0, y=0, z=0, w=1))),
+        size=(0.40, 0.40, buildPlate))
     
     psi.attach_box('world', 'build_plate')
 
-    psi.add_box(
-        name="build_plate_screw_back",
-        pose=PoseStamped(
-            header=Header(frame_id=robot.get_planning_frame()),
-            pose=Pose(position=Point(x=-0.27625, y=0.5, z=0.015), orientation=Quaternion(x=0, y=0, z=0, w=1))),
-        size=(0.03, 0.03, 0.03))
+    # psi.add_box(
+    #     name="build_plate_screw_back",
+    #     pose=PoseStamped(
+    #         header=Header(frame_id=robot.get_planning_frame()),
+    #         pose=Pose(position=Point(x=-0.27625, y=0.5, z=0.015), orientation=Quaternion(x=0, y=0, z=0, w=1))),
+    #     size=(0.03, 0.03, 0.03))
     
-    psi.attach_box('world', 'build_plate_screw_back')
+    # psi.attach_box('world', 'build_plate_screw_back')
 
-    psi.add_box(
-        name="build_plate_screw_front",
-        pose=PoseStamped(
-            header=Header(frame_id=robot.get_planning_frame()),
-            pose=Pose(position=Point(x=0.27625, y=0.5, z=0.015), orientation=Quaternion(x=0, y=0, z=0, w=1))),
-        size=(0.03, 0.03, 0.03))
+    # psi.add_box(
+    #     name="build_plate_screw_front",
+    #     pose=PoseStamped(
+    #         header=Header(frame_id=robot.get_planning_frame()),
+    #         pose=Pose(position=Point(x=0.27625, y=0.5, z=0.015), orientation=Quaternion(x=0, y=0, z=0, w=1))),
+    #     size=(0.03, 0.03, 0.03))
     
-    psi.attach_box('world', 'build_plate_screw_front')
+    # psi.attach_box('world', 'build_plate_screw_front')
 
     psi.add_box(
         name="build_plate_screw_left_back",
         pose=PoseStamped(
             header=Header(frame_id=robot.get_planning_frame()),
-            pose=Pose(position=Point(x=-0.245, y=0.29375, z=0.015), orientation=Quaternion(x=0, y=0, z=0, w=1))),
-        size=(0.03, 0.03, 0.03))
+            pose=Pose(position=Point(x=-0.15, y=0.285, z=buildPlate+0.01), orientation=Quaternion(x=0, y=0, z=0, w=1))),
+        size=(0.03, 0.03, 0.02))
     
     psi.attach_box('world', 'build_plate_screw_left_back')
 
@@ -76,8 +86,8 @@ if __name__ == '__main__':
         name="build_plate_screw_left_front",
         pose=PoseStamped(
             header=Header(frame_id=robot.get_planning_frame()),
-            pose=Pose(position=Point(x=0.245, y=0.29375, z=0.015), orientation=Quaternion(x=0, y=0, z=0, w=1))),
-        size=(0.03, 0.03, 0.03))
+            pose=Pose(position=Point(x=0.15, y=0.285, z=buildPlate+0.01), orientation=Quaternion(x=0, y=0, z=0, w=1))),
+        size=(0.03, 0.03, 0.02))
     
     psi.attach_box('world', 'build_plate_screw_left_front')
 
@@ -85,8 +95,8 @@ if __name__ == '__main__':
         name="build_plate_screw_right_back",
         pose=PoseStamped(
             header=Header(frame_id=robot.get_planning_frame()),
-            pose=Pose(position=Point(x=-0.245, y=0.70625, z=0.015), orientation=Quaternion(x=0, y=0, z=0, w=1))),
-        size=(0.03, 0.03, 0.03))
+            pose=Pose(position=Point(x=-0.17, y=0.715, z=buildPlate+0.01), orientation=Quaternion(x=0, y=0, z=0, w=1))),
+        size=(0.03, 0.03, 0.02))
     
     psi.attach_box('world', 'build_plate_screw_right_back')
 
@@ -94,8 +104,8 @@ if __name__ == '__main__':
         name="build_plate_screw_right_front",
         pose=PoseStamped(
             header=Header(frame_id=robot.get_planning_frame()),
-            pose=Pose(position=Point(x=0.245, y=0.70625, z=0.015), orientation=Quaternion(x=0, y=0, z=0, w=1))),
-        size=(0.03, 0.03, 0.03))
+            pose=Pose(position=Point(x=0.17, y=0.715, z=buildPlate+0.01), orientation=Quaternion(x=0, y=0, z=0, w=1))),
+        size=(0.03, 0.03, 0.02))
     
     psi.attach_box('world', 'build_plate_screw_right_front')
 
@@ -111,13 +121,13 @@ if __name__ == '__main__':
         normal=(0,0,1),
         offset=0)
     
-    psi.add_plane(
-        name="left_plane", 
-        pose=PoseStamped(
-            header=Header(stamp=rospy.Time.now(), frame_id=robot.get_planning_frame()),
-            pose=Pose(position=Point(x=0, y=-0.12 ,z=0), orientation=Quaternion(x=0, y=0, z=0, w=1))),
-        normal=(0,1,0),
-        offset=0)
+    # psi.add_plane(
+    #     name="left_plane", 
+    #     pose=PoseStamped(
+    #         header=Header(stamp=rospy.Time.now(), frame_id=robot.get_planning_frame()),
+    #         pose=Pose(position=Point(x=0, y=-0.12 ,z=0), orientation=Quaternion(x=0, y=0, z=0, w=1))),
+    #     normal=(0,1,0),
+    #     offset=0)
     
     psi.add_plane(
         name="right_plane", 
@@ -142,7 +152,15 @@ if __name__ == '__main__':
             pose=Pose(position=Point(x=0.35, y=0 ,z=0), orientation=Quaternion(x=0, y=0, z=0, w=1))),
         normal=(1,0,0),
         offset=0)
-
-    # rospy.sleep(1)
+    
     rospy.loginfo(psi.get_known_object_names())
+    
+    while not rospy.is_shutdown():
+        br.sendTransform((0.15, 0.65, buildPlate),
+                        tf.transformations.quaternion_from_euler(0, 0, -1*pi),
+                        rospy.Time.now(),
+                        "buildPlate",
+                        "world")
+        rate.sleep()
+    
     mc.roscpp_shutdown()
