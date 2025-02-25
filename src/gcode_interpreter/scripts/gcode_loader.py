@@ -1,42 +1,45 @@
 import rospy
+import fdm_msgs.msg
 from std_msgs.msg import String
 import sys
 import json
 
-class topicPublisher:
+class Communication:
     def __init__(self):
-        rospy.init_node('gcode_publisher', anonymous=True)
+        rospy.init_node('gcode_interpreter', anonymous=True)
         
-        self.movement_pub = rospy.Publisher('gcode_movement', String, queue_size=10)
-        self.printing_pub = rospy.Publisher('gcode_printing', String, queue_size=10)
+        self.gcode_command_pub = rospy.Publisher('gcode_command', fdm_msgs.msg.GCodeCommand, queue_size=10)
 
-        # Wait for the client node (or any subscriber) to connect on gcode_movement
-        while (self.movement_pub.get_num_connections() or self.printing_pub.get_num_connections()) == 0:
-            rospy.logwarn("Waiting for subscribers to connect on 'gcode_movement' or 'gcode_printing'...")
+        while self.gcode_command_pub.get_num_connections() == 0:
+            rospy.logwarn("Waiting for subscribers to connect on 'gcode_command'...")
             rospy.sleep(1)
 
+        rospy.loginfo("Communication initialized. Publishing to /gcode_command")
+
         return
+    
+    def subscriber(self, gcodeInterpreter):
+        rospy.Subscriber("gcode_movement", fdm_msgs.msg.GCode, gcodeInterpreter.line_interpreter)
 
+        rospy.spin()
 
-    def publish_gcode_lines(self, movementCommand, printingCommand):
-        rospy.loginfo(f"Publishing: {movementCommand} on 'gcode_movement'")
-        # rospy.loginfo(f"Publishing: {printingCommand} on 'gcode_printing'")
-
-        self.movement_pub.publish(movementCommand)
-        self.printing_pub.publish(printingCommand)
-
-        # rospy.sleep(0.5)
+    def publish_gcode_command(self, command):
+        gcodeCommand_msg = fdm_msgs.msg.GCodeCommand()
+        gcodeCommand_msg.seq_id = command['seq_id']
+        #and more
+        self.gcode_publisher.publish(gcodeCommand_msg)
 
         return
 
 class gcodeInterpreter:
-    def __init__(self):
+    def __init__(self, comms):
+        self.comms = comms
         self.x_value = None
         self.y_value = None
         self.z_value = None
         self.f_value = None
 
-    def line_interpreter(self, line, command_number, line_number):
+    def line_interpreter(self, gcode_msg):
         # Split the comment and command parts
         parts = line.split(";", 1)
         comment = parts[1].strip() if len(parts) > 1 else ""
@@ -93,37 +96,10 @@ class gcodeInterpreter:
         
         return json.dumps(movementCommand), json.dumps(printingCommand)
 
-
-    def gcode_parser(self, file_path):
-        try:
-            command_number = 0
-            with open(file_path, 'r') as file:
-                for line_number, line in enumerate(file, start=1):
-                    command = line.strip()
-                    if not command:
-                        continue
-                    
-                    command_number += 1
-                    print('here')
-                    movementCommand, printingCommand = self.line_interpreter(command, command_number, line_number)
-                    publisher.publish_gcode_lines(movementCommand, printingCommand)
-                    
-            rospy.loginfo("Finished processing G-code file.")
-        except Exception as e:
-            rospy.logerr(f"Error reading file: {e}")
-
-        return
+def main():
+    comms = Communication()
+    gcodeInterpreter = gcodeInterpreter(comms)
+    comms.subscriber(gcodeInterpreter)
 
 if __name__ == '__main__':
-    publisher = topicPublisher()
-    interpreter = gcodeInterpreter()
-
-    try:
-        if len(sys.argv) < 2:
-            rospy.logerr("Usage: rosrun gcode_interpreter gcode_loader <file.gcode>")
-            sys.exit(1)
-        
-        gcode_file_path = sys.argv[1]
-        interpreter.gcode_parser(gcode_file_path)
-    except rospy.ROSInterruptException:
-        pass
+    main()
