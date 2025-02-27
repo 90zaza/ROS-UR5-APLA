@@ -1,0 +1,62 @@
+#!/usr/bin/env python
+
+import rospy
+import fdm_msgs.msg
+from std_msgs.msg import String
+import sys
+import os
+
+class Communication:
+    def __init__(self):
+        rospy.init_node('main', anonymous=True)
+        self.gcode_publisher = rospy.Publisher('/gcode_raw', fdm_msgs.msg.GCode, queue_size=10)
+        
+        while self.gcode_publisher.get_num_connections() == 0:
+            rospy.logwarn("Waiting for subscribers to connect on 'gcode_raw'...")
+            rospy.sleep(1)
+
+        rospy.loginfo("Communication initialized. Publishing to /gcode_raw")
+
+    def publish_gcode_raw(self, lines):
+        gcode_msg = fdm_msgs.msg.GCode()
+        gcode_msg.lines = lines
+        self.gcode_publisher.publish(gcode_msg)
+
+class GCodeInterpreter:
+    def __init__(self, file_path, comms):
+        self.file_path = file_path
+        self.comms = comms
+        self.gCodeList = []
+
+    def parser(self):
+        with open(self.file_path, 'r') as file:
+            gcode_lines = file.readlines()
+              
+        for line in gcode_lines:
+            self.gCodeList.append(line.strip())
+
+        self.comms.publish_gcode_raw(self.gCodeList)
+        rospy.loginfo("Finished parsing and publishing gCode.")
+
+def main():
+    if len(sys.argv) > 1:
+        gcode_path = sys.argv[1]
+        if os.path.isfile(gcode_path):
+            print(f"Found gCode file: {gcode_path}")
+        else:
+            print("Error: Provided file path does not exist.")
+            return
+    else:
+        gcode_path = input("Please enter the path to the gCode file: ").strip()
+        while not os.path.isfile(gcode_path):
+            print("Invalid file path. Try again.")
+            gcode_path = input("Please enter the path to the gCode file: ").strip()
+    
+    comms = Communication()
+    interpreter = GCodeInterpreter(gcode_path, comms)
+    interpreter.parser()
+
+    return
+
+if __name__ == '__main__':
+    main()

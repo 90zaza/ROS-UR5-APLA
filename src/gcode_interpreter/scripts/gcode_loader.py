@@ -11,7 +11,7 @@ class Communication:
     def __init__(self):
         self.gcodeInterpreter = None
 
-        self.gcode_command_pub = rospy.Publisher('/gcode_command', fdm_msgs.msg.GCodeCommand, queue_size=10)
+        self.gcode_command_pub = rospy.Publisher('/gcode_command', fdm_msgs.msg.GCodeCommand, queue_size=100)
     
     def set_class_pointers(self, gcodeInterpreter):
         self.gcodeInterpreter = gcodeInterpreter
@@ -28,6 +28,7 @@ class Communication:
             rospy.logwarn("Waiting for subscribers to connect on 'gcode_command'...")
             rospy.sleep(1)
 
+        rospy.sleep(2)
         rospy.loginfo("Communication initialized for gcode_loader.py. Publishing to /gcode_command")
 
         return

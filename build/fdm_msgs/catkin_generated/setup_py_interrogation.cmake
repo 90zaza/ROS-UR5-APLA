@@ -1,0 +1,7 @@
+set(fdm_msgs_SETUP_PY_SETUP_MODULE "distutils.core")
+set(fdm_msgs_SETUP_PY_VERSION "0.0.0")
+set(fdm_msgs_SETUP_PY_SCRIPTS "")
+set(fdm_msgs_SETUP_PY_PACKAGES "fdm_msgs")
+set(fdm_msgs_SETUP_PY_PACKAGE_DIRS "src/fdm_msgs")
+set(fdm_msgs_SETUP_PY_MODULES "")
+set(fdm_msgs_SETUP_PY_MODULE_DIRS "")
