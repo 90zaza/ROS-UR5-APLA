@@ -11,7 +11,7 @@ class Communication:
     def __init__(self):
         self.gcodeInterpreter = None
 
-        self.gcode_command_pub = rospy.Publisher('/gcode_command', fdm_msgs.msg.GCodeCommand, queue_size=100)
+        self.gcode_command_pub = rospy.Publisher('/gcode_command', fdm_msgs.msg.GCodeCommand, queue_size=10)
     
     def set_class_pointers(self, gcodeInterpreter):
         self.gcodeInterpreter = gcodeInterpreter
@@ -36,6 +36,7 @@ class Communication:
 
     def publish_gcode_command(self, command):
         self.gcode_command_pub.publish(command)
+        rospy.sleep(0.01)
 
         return
 
@@ -80,7 +81,6 @@ class GCodeInterpreter:
                     gcodeCommand_msg.has_movement = True
                 elif param[0] == "F":
                     self.f_value = float(param[1:])
-                    gcodeCommand_msg.has_movement = True
                     hasF = True
                 else:
                     printing_command.append(param)
