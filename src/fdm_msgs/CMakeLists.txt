@@ -11,6 +11,7 @@ find_package(catkin REQUIRED COMPONENTS
   message_generation
   message_runtime
   std_msgs
+  moveit_msgs
 )
 
 ## System dependencies are found with CMake's conventions
@@ -51,6 +52,7 @@ catkin_python_setup()
    FILES
    GCode.msg
    GCodeCommand.msg
+   MovementPlan.msg
  )
 
 ## Generate services in the 'srv' folder
@@ -71,6 +73,7 @@ catkin_python_setup()
 generate_messages(
   DEPENDENCIES
   std_msgs
+  moveit_msgs
 )
 
 ################################################

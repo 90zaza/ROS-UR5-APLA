@@ -3,6 +3,7 @@ import rospy
 import copy
 import json
 import std_msgs.msg
+import fdm_msgs.msg
 import moveit_msgs.msg
 import sensor_msgs.msg
 import geometry_msgs.msg
@@ -11,11 +12,45 @@ from math import pi
 from std_msgs.msg import String
 from tf.transformations import quaternion_from_euler
 
+class Communication:
+    def __init__(self):
+        self.toolpathPlanner = None
+
+        self.display_trajectory_publisher = rospy.Publisher('/move_group/display_planned_path',
+                                            moveit_msgs.msg.DisplayTrajectory,
+                                            queue_size=20)
+        self.movementPlanResponse_publisher = rospy.Publisher('/movement_plan_response', fdm_msgs.msg.MovementPlan, queue_size=10)
+
+    def set_class_pointers(self, toolpathPlanner):
+        self.toolpathPlanner = toolpathPlanner
+
+        return
+    
+    def set_subscribers(self):
+        rospy.Subscriber("movement_plan_request", fdm_msgs.msg.GCodeCommand, self.toolpathPlanner.robotPosition())
+
+        return
+    
+    def wait_for_publishers(self):
+        while self.movementPlanResponse_publisher.get_num_connections() == 0:
+            rospy.logwarn("Waiting for subscribers to connect on 'movement_plan_response'...")
+            rospy.sleep(1)
+
+        rospy.sleep(2)
+        rospy.loginfo("Communication initialized for toolpath_plan.py.")
+
+        return
+    
+    def publish_gcode_command(self, command):
+        self.gcode_command_pub.publish(command)
+        rospy.sleep(0.01)
+
+        return
+    
 class toolpathPlan:
     def __init__(self):
         # mc.roscpp_initialize(sys.argv)
-        rospy.init_node('toolpathPlan', anonymous=True)
-        
+                
         self.robot = mc.RobotCommander()
         self.psi = mc.PlanningSceneInterface()
         self.move_group = mc.MoveGroupCommander('manipulator')
@@ -50,9 +85,6 @@ class toolpathPlan:
         self.trajectory_list = []
         self.last_time = rospy.Duration(0)
 
-        self.display_trajectory_publisher = rospy.Publisher('/move_group/display_planned_path',
-                                            moveit_msgs.msg.DisplayTrajectory,
-                                            queue_size=20)
         self.display_trajectory = moveit_msgs.msg.DisplayTrajectory()
         self.display_trajectory.trajectory_start = self.robot.get_current_state()
 
@@ -133,6 +165,14 @@ class toolpathPlan:
         
         self.move_group.execute(full_trajectory, wait=True)
         print("Trajectory execution completed!")
+
+
+def main():
+    rospy.init_node('toolpathPlan', anonymous=True)
+
+    comms = Communication()
+    toolpathPlan = ToolpathPlan(comms)
+
 
 if __name__ == '__main__':
     toolpathPlan = toolpathPlan()

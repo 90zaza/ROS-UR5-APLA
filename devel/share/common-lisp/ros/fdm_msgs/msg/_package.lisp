@@ -5,5 +5,7 @@
    "GCODE"
    "<GCODECOMMAND>"
    "GCODECOMMAND"
+   "<MOVEMENTPLAN>"
+   "MOVEMENTPLAN"
   ))
 

@@ -1,6 +1,7 @@
 file(REMOVE_RECURSE
   "/home/tim/FDMPrinting/devel/share/common-lisp/ros/fdm_msgs/msg/GCode.lisp"
   "/home/tim/FDMPrinting/devel/share/common-lisp/ros/fdm_msgs/msg/GCodeCommand.lisp"
+  "/home/tim/FDMPrinting/devel/share/common-lisp/ros/fdm_msgs/msg/MovementPlan.lisp"
   "CMakeFiles/fdm_msgs_generate_messages_lisp"
 )
 

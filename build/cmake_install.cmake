@@ -131,9 +131,9 @@ endif()
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for each subdirectory.
   include("/home/tim/FDMPrinting/build/gtest/cmake_install.cmake")
-  include("/home/tim/FDMPrinting/build/fdm_msgs/cmake_install.cmake")
   include("/home/tim/FDMPrinting/build/ur5_apla_moveit_config/cmake_install.cmake")
   include("/home/tim/FDMPrinting/build/duet3_control/cmake_install.cmake")
+  include("/home/tim/FDMPrinting/build/fdm_msgs/cmake_install.cmake")
   include("/home/tim/FDMPrinting/build/gcode_interpreter/cmake_install.cmake")
   include("/home/tim/FDMPrinting/build/ur5_apla/cmake_install.cmake")
 

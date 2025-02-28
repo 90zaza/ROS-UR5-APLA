@@ -1,8 +1,8 @@
 # generated from genmsg/cmake/pkg-genmsg.cmake.em
 
-message(STATUS "fdm_msgs: 2 messages, 0 services")
+message(STATUS "fdm_msgs: 3 messages, 0 services")
 
-set(MSG_I_FLAGS "-Ifdm_msgs:/home/tim/FDMPrinting/src/fdm_msgs/msg;-Istd_msgs:/opt/ros/noetic/share/std_msgs/cmake/../msg")
+set(MSG_I_FLAGS "-Ifdm_msgs:/home/tim/FDMPrinting/src/fdm_msgs/msg;-Istd_msgs:/opt/ros/noetic/share/std_msgs/cmake/../msg;-Imoveit_msgs:/opt/ros/noetic/share/moveit_msgs/cmake/../msg;-Iactionlib_msgs:/opt/ros/noetic/share/actionlib_msgs/cmake/../msg;-Isensor_msgs:/opt/ros/noetic/share/sensor_msgs/cmake/../msg;-Igeometry_msgs:/opt/ros/noetic/share/geometry_msgs/cmake/../msg;-Itrajectory_msgs:/opt/ros/noetic/share/trajectory_msgs/cmake/../msg;-Ishape_msgs:/opt/ros/noetic/share/shape_msgs/cmake/../msg;-Iobject_recognition_msgs:/opt/ros/noetic/share/object_recognition_msgs/cmake/../msg;-Ioctomap_msgs:/opt/ros/noetic/share/octomap_msgs/cmake/../msg")
 
 # Find all generators
 find_package(gencpp REQUIRED)
@@ -27,6 +27,11 @@ add_custom_target(_fdm_msgs_generate_messages_check_deps_${_filename}
   COMMAND ${CATKIN_ENV} ${PYTHON_EXECUTABLE} ${GENMSG_CHECK_DEPS_SCRIPT} "fdm_msgs" "/home/tim/FDMPrinting/src/fdm_msgs/msg/GCodeCommand.msg" ""
 )
 
+get_filename_component(_filename "/home/tim/FDMPrinting/src/fdm_msgs/msg/MovementPlan.msg" NAME_WE)
+add_custom_target(_fdm_msgs_generate_messages_check_deps_${_filename}
+  COMMAND ${CATKIN_ENV} ${PYTHON_EXECUTABLE} ${GENMSG_CHECK_DEPS_SCRIPT} "fdm_msgs" "/home/tim/FDMPrinting/src/fdm_msgs/msg/MovementPlan.msg" "std_msgs/Header:trajectory_msgs/MultiDOFJointTrajectoryPoint:geometry_msgs/Quaternion:geometry_msgs/Transform:moveit_msgs/RobotTrajectory:geometry_msgs/Twist:trajectory_msgs/JointTrajectoryPoint:trajectory_msgs/JointTrajectory:trajectory_msgs/MultiDOFJointTrajectory:geometry_msgs/Vector3"
+)
+
 #
 #  langs = gencpp;geneus;genlisp;gennodejs;genpy
 #
@@ -43,6 +48,12 @@ _generate_msg_cpp(fdm_msgs
   "/home/tim/FDMPrinting/src/fdm_msgs/msg/GCodeCommand.msg"
   "${MSG_I_FLAGS}"
   ""
+  ${CATKIN_DEVEL_PREFIX}/${gencpp_INSTALL_DIR}/fdm_msgs
+)
+_generate_msg_cpp(fdm_msgs
+  "/home/tim/FDMPrinting/src/fdm_msgs/msg/MovementPlan.msg"
+  "${MSG_I_FLAGS}"
+  "/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/opt/ros/noetic/share/trajectory_msgs/cmake/../msg/MultiDOFJointTrajectoryPoint.msg;/opt/ros/noetic/share/geometry_msgs/cmake/../msg/Quaternion.msg;/opt/ros/noetic/share/geometry_msgs/cmake/../msg/Transform.msg;/opt/ros/noetic/share/moveit_msgs/cmake/../msg/RobotTrajectory.msg;/opt/ros/noetic/share/geometry_msgs/cmake/../msg/Twist.msg;/opt/ros/noetic/share/trajectory_msgs/cmake/../msg/JointTrajectoryPoint.msg;/opt/ros/noetic/share/trajectory_msgs/cmake/../msg/JointTrajectory.msg;/opt/ros/noetic/share/trajectory_msgs/cmake/../msg/MultiDOFJointTrajectory.msg;/opt/ros/noetic/share/geometry_msgs/cmake/../msg/Vector3.msg"
   ${CATKIN_DEVEL_PREFIX}/${gencpp_INSTALL_DIR}/fdm_msgs
 )
 
@@ -63,6 +74,8 @@ add_dependencies(fdm_msgs_generate_messages fdm_msgs_generate_messages_cpp)
 get_filename_component(_filename "/home/tim/FDMPrinting/src/fdm_msgs/msg/GCode.msg" NAME_WE)
 add_dependencies(fdm_msgs_generate_messages_cpp _fdm_msgs_generate_messages_check_deps_${_filename})
 get_filename_component(_filename "/home/tim/FDMPrinting/src/fdm_msgs/msg/GCodeCommand.msg" NAME_WE)
+add_dependencies(fdm_msgs_generate_messages_cpp _fdm_msgs_generate_messages_check_deps_${_filename})
+get_filename_component(_filename "/home/tim/FDMPrinting/src/fdm_msgs/msg/MovementPlan.msg" NAME_WE)
 add_dependencies(fdm_msgs_generate_messages_cpp _fdm_msgs_generate_messages_check_deps_${_filename})
 
 # target for backward compatibility
@@ -86,6 +99,12 @@ _generate_msg_eus(fdm_msgs
   ""
   ${CATKIN_DEVEL_PREFIX}/${geneus_INSTALL_DIR}/fdm_msgs
 )
+_generate_msg_eus(fdm_msgs
+  "/home/tim/FDMPrinting/src/fdm_msgs/msg/MovementPlan.msg"
+  "${MSG_I_FLAGS}"
+  "/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/opt/ros/noetic/share/trajectory_msgs/cmake/../msg/MultiDOFJointTrajectoryPoint.msg;/opt/ros/noetic/share/geometry_msgs/cmake/../msg/Quaternion.msg;/opt/ros/noetic/share/geometry_msgs/cmake/../msg/Transform.msg;/opt/ros/noetic/share/moveit_msgs/cmake/../msg/RobotTrajectory.msg;/opt/ros/noetic/share/geometry_msgs/cmake/../msg/Twist.msg;/opt/ros/noetic/share/trajectory_msgs/cmake/../msg/JointTrajectoryPoint.msg;/opt/ros/noetic/share/trajectory_msgs/cmake/../msg/JointTrajectory.msg;/opt/ros/noetic/share/trajectory_msgs/cmake/../msg/MultiDOFJointTrajectory.msg;/opt/ros/noetic/share/geometry_msgs/cmake/../msg/Vector3.msg"
+  ${CATKIN_DEVEL_PREFIX}/${geneus_INSTALL_DIR}/fdm_msgs
+)
 
 ### Generating Services
 
@@ -104,6 +123,8 @@ add_dependencies(fdm_msgs_generate_messages fdm_msgs_generate_messages_eus)
 get_filename_component(_filename "/home/tim/FDMPrinting/src/fdm_msgs/msg/GCode.msg" NAME_WE)
 add_dependencies(fdm_msgs_generate_messages_eus _fdm_msgs_generate_messages_check_deps_${_filename})
 get_filename_component(_filename "/home/tim/FDMPrinting/src/fdm_msgs/msg/GCodeCommand.msg" NAME_WE)
+add_dependencies(fdm_msgs_generate_messages_eus _fdm_msgs_generate_messages_check_deps_${_filename})
+get_filename_component(_filename "/home/tim/FDMPrinting/src/fdm_msgs/msg/MovementPlan.msg" NAME_WE)
 add_dependencies(fdm_msgs_generate_messages_eus _fdm_msgs_generate_messages_check_deps_${_filename})
 
 # target for backward compatibility
@@ -127,6 +148,12 @@ _generate_msg_lisp(fdm_msgs
   ""
   ${CATKIN_DEVEL_PREFIX}/${genlisp_INSTALL_DIR}/fdm_msgs
 )
+_generate_msg_lisp(fdm_msgs
+  "/home/tim/FDMPrinting/src/fdm_msgs/msg/MovementPlan.msg"
+  "${MSG_I_FLAGS}"
+  "/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/opt/ros/noetic/share/trajectory_msgs/cmake/../msg/MultiDOFJointTrajectoryPoint.msg;/opt/ros/noetic/share/geometry_msgs/cmake/../msg/Quaternion.msg;/opt/ros/noetic/share/geometry_msgs/cmake/../msg/Transform.msg;/opt/ros/noetic/share/moveit_msgs/cmake/../msg/RobotTrajectory.msg;/opt/ros/noetic/share/geometry_msgs/cmake/../msg/Twist.msg;/opt/ros/noetic/share/trajectory_msgs/cmake/../msg/JointTrajectoryPoint.msg;/opt/ros/noetic/share/trajectory_msgs/cmake/../msg/JointTrajectory.msg;/opt/ros/noetic/share/trajectory_msgs/cmake/../msg/MultiDOFJointTrajectory.msg;/opt/ros/noetic/share/geometry_msgs/cmake/../msg/Vector3.msg"
+  ${CATKIN_DEVEL_PREFIX}/${genlisp_INSTALL_DIR}/fdm_msgs
+)
 
 ### Generating Services
 
@@ -145,6 +172,8 @@ add_dependencies(fdm_msgs_generate_messages fdm_msgs_generate_messages_lisp)
 get_filename_component(_filename "/home/tim/FDMPrinting/src/fdm_msgs/msg/GCode.msg" NAME_WE)
 add_dependencies(fdm_msgs_generate_messages_lisp _fdm_msgs_generate_messages_check_deps_${_filename})
 get_filename_component(_filename "/home/tim/FDMPrinting/src/fdm_msgs/msg/GCodeCommand.msg" NAME_WE)
+add_dependencies(fdm_msgs_generate_messages_lisp _fdm_msgs_generate_messages_check_deps_${_filename})
+get_filename_component(_filename "/home/tim/FDMPrinting/src/fdm_msgs/msg/MovementPlan.msg" NAME_WE)
 add_dependencies(fdm_msgs_generate_messages_lisp _fdm_msgs_generate_messages_check_deps_${_filename})
 
 # target for backward compatibility
@@ -168,6 +197,12 @@ _generate_msg_nodejs(fdm_msgs
   ""
   ${CATKIN_DEVEL_PREFIX}/${gennodejs_INSTALL_DIR}/fdm_msgs
 )
+_generate_msg_nodejs(fdm_msgs
+  "/home/tim/FDMPrinting/src/fdm_msgs/msg/MovementPlan.msg"
+  "${MSG_I_FLAGS}"
+  "/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/opt/ros/noetic/share/trajectory_msgs/cmake/../msg/MultiDOFJointTrajectoryPoint.msg;/opt/ros/noetic/share/geometry_msgs/cmake/../msg/Quaternion.msg;/opt/ros/noetic/share/geometry_msgs/cmake/../msg/Transform.msg;/opt/ros/noetic/share/moveit_msgs/cmake/../msg/RobotTrajectory.msg;/opt/ros/noetic/share/geometry_msgs/cmake/../msg/Twist.msg;/opt/ros/noetic/share/trajectory_msgs/cmake/../msg/JointTrajectoryPoint.msg;/opt/ros/noetic/share/trajectory_msgs/cmake/../msg/JointTrajectory.msg;/opt/ros/noetic/share/trajectory_msgs/cmake/../msg/MultiDOFJointTrajectory.msg;/opt/ros/noetic/share/geometry_msgs/cmake/../msg/Vector3.msg"
+  ${CATKIN_DEVEL_PREFIX}/${gennodejs_INSTALL_DIR}/fdm_msgs
+)
 
 ### Generating Services
 
@@ -186,6 +221,8 @@ add_dependencies(fdm_msgs_generate_messages fdm_msgs_generate_messages_nodejs)
 get_filename_component(_filename "/home/tim/FDMPrinting/src/fdm_msgs/msg/GCode.msg" NAME_WE)
 add_dependencies(fdm_msgs_generate_messages_nodejs _fdm_msgs_generate_messages_check_deps_${_filename})
 get_filename_component(_filename "/home/tim/FDMPrinting/src/fdm_msgs/msg/GCodeCommand.msg" NAME_WE)
+add_dependencies(fdm_msgs_generate_messages_nodejs _fdm_msgs_generate_messages_check_deps_${_filename})
+get_filename_component(_filename "/home/tim/FDMPrinting/src/fdm_msgs/msg/MovementPlan.msg" NAME_WE)
 add_dependencies(fdm_msgs_generate_messages_nodejs _fdm_msgs_generate_messages_check_deps_${_filename})
 
 # target for backward compatibility
@@ -209,6 +246,12 @@ _generate_msg_py(fdm_msgs
   ""
   ${CATKIN_DEVEL_PREFIX}/${genpy_INSTALL_DIR}/fdm_msgs
 )
+_generate_msg_py(fdm_msgs
+  "/home/tim/FDMPrinting/src/fdm_msgs/msg/MovementPlan.msg"
+  "${MSG_I_FLAGS}"
+  "/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/opt/ros/noetic/share/trajectory_msgs/cmake/../msg/MultiDOFJointTrajectoryPoint.msg;/opt/ros/noetic/share/geometry_msgs/cmake/../msg/Quaternion.msg;/opt/ros/noetic/share/geometry_msgs/cmake/../msg/Transform.msg;/opt/ros/noetic/share/moveit_msgs/cmake/../msg/RobotTrajectory.msg;/opt/ros/noetic/share/geometry_msgs/cmake/../msg/Twist.msg;/opt/ros/noetic/share/trajectory_msgs/cmake/../msg/JointTrajectoryPoint.msg;/opt/ros/noetic/share/trajectory_msgs/cmake/../msg/JointTrajectory.msg;/opt/ros/noetic/share/trajectory_msgs/cmake/../msg/MultiDOFJointTrajectory.msg;/opt/ros/noetic/share/geometry_msgs/cmake/../msg/Vector3.msg"
+  ${CATKIN_DEVEL_PREFIX}/${genpy_INSTALL_DIR}/fdm_msgs
+)
 
 ### Generating Services
 
@@ -227,6 +270,8 @@ add_dependencies(fdm_msgs_generate_messages fdm_msgs_generate_messages_py)
 get_filename_component(_filename "/home/tim/FDMPrinting/src/fdm_msgs/msg/GCode.msg" NAME_WE)
 add_dependencies(fdm_msgs_generate_messages_py _fdm_msgs_generate_messages_check_deps_${_filename})
 get_filename_component(_filename "/home/tim/FDMPrinting/src/fdm_msgs/msg/GCodeCommand.msg" NAME_WE)
+add_dependencies(fdm_msgs_generate_messages_py _fdm_msgs_generate_messages_check_deps_${_filename})
+get_filename_component(_filename "/home/tim/FDMPrinting/src/fdm_msgs/msg/MovementPlan.msg" NAME_WE)
 add_dependencies(fdm_msgs_generate_messages_py _fdm_msgs_generate_messages_check_deps_${_filename})
 
 # target for backward compatibility
@@ -248,6 +293,9 @@ endif()
 if(TARGET std_msgs_generate_messages_cpp)
   add_dependencies(fdm_msgs_generate_messages_cpp std_msgs_generate_messages_cpp)
 endif()
+if(TARGET moveit_msgs_generate_messages_cpp)
+  add_dependencies(fdm_msgs_generate_messages_cpp moveit_msgs_generate_messages_cpp)
+endif()
 
 if(geneus_INSTALL_DIR AND EXISTS ${CATKIN_DEVEL_PREFIX}/${geneus_INSTALL_DIR}/fdm_msgs)
   # install generated code
@@ -258,6 +306,9 @@ if(geneus_INSTALL_DIR AND EXISTS ${CATKIN_DEVEL_PREFIX}/${geneus_INSTALL_DIR}/fd
 endif()
 if(TARGET std_msgs_generate_messages_eus)
   add_dependencies(fdm_msgs_generate_messages_eus std_msgs_generate_messages_eus)
+endif()
+if(TARGET moveit_msgs_generate_messages_eus)
+  add_dependencies(fdm_msgs_generate_messages_eus moveit_msgs_generate_messages_eus)
 endif()
 
 if(genlisp_INSTALL_DIR AND EXISTS ${CATKIN_DEVEL_PREFIX}/${genlisp_INSTALL_DIR}/fdm_msgs)
@@ -270,6 +321,9 @@ endif()
 if(TARGET std_msgs_generate_messages_lisp)
   add_dependencies(fdm_msgs_generate_messages_lisp std_msgs_generate_messages_lisp)
 endif()
+if(TARGET moveit_msgs_generate_messages_lisp)
+  add_dependencies(fdm_msgs_generate_messages_lisp moveit_msgs_generate_messages_lisp)
+endif()
 
 if(gennodejs_INSTALL_DIR AND EXISTS ${CATKIN_DEVEL_PREFIX}/${gennodejs_INSTALL_DIR}/fdm_msgs)
   # install generated code
@@ -280,6 +334,9 @@ if(gennodejs_INSTALL_DIR AND EXISTS ${CATKIN_DEVEL_PREFIX}/${gennodejs_INSTALL_D
 endif()
 if(TARGET std_msgs_generate_messages_nodejs)
   add_dependencies(fdm_msgs_generate_messages_nodejs std_msgs_generate_messages_nodejs)
+endif()
+if(TARGET moveit_msgs_generate_messages_nodejs)
+  add_dependencies(fdm_msgs_generate_messages_nodejs moveit_msgs_generate_messages_nodejs)
 endif()
 
 if(genpy_INSTALL_DIR AND EXISTS ${CATKIN_DEVEL_PREFIX}/${genpy_INSTALL_DIR}/fdm_msgs)
@@ -303,4 +360,7 @@ if(genpy_INSTALL_DIR AND EXISTS ${CATKIN_DEVEL_PREFIX}/${genpy_INSTALL_DIR}/fdm_
 endif()
 if(TARGET std_msgs_generate_messages_py)
   add_dependencies(fdm_msgs_generate_messages_py std_msgs_generate_messages_py)
+endif()
+if(TARGET moveit_msgs_generate_messages_py)
+  add_dependencies(fdm_msgs_generate_messages_py moveit_msgs_generate_messages_py)
 endif()

@@ -55,28 +55,46 @@ include fdm_msgs/CMakeFiles/fdm_msgs_generate_messages_py.dir/progress.make
 
 fdm_msgs/CMakeFiles/fdm_msgs_generate_messages_py: /home/tim/FDMPrinting/devel/lib/python3/dist-packages/fdm_msgs/msg/_GCode.py
 fdm_msgs/CMakeFiles/fdm_msgs_generate_messages_py: /home/tim/FDMPrinting/devel/lib/python3/dist-packages/fdm_msgs/msg/_GCodeCommand.py
+fdm_msgs/CMakeFiles/fdm_msgs_generate_messages_py: /home/tim/FDMPrinting/devel/lib/python3/dist-packages/fdm_msgs/msg/_MovementPlan.py
 fdm_msgs/CMakeFiles/fdm_msgs_generate_messages_py: /home/tim/FDMPrinting/devel/lib/python3/dist-packages/fdm_msgs/msg/__init__.py
 
 
 /home/tim/FDMPrinting/devel/lib/python3/dist-packages/fdm_msgs/msg/_GCode.py: /opt/ros/noetic/lib/genpy/genmsg_py.py
 /home/tim/FDMPrinting/devel/lib/python3/dist-packages/fdm_msgs/msg/_GCode.py: /home/tim/FDMPrinting/src/fdm_msgs/msg/GCode.msg
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/home/tim/FDMPrinting/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Generating Python from MSG fdm_msgs/GCode"
-	cd /home/tim/FDMPrinting/build/fdm_msgs && ../catkin_generated/env_cached.sh /usr/bin/python3 /opt/ros/noetic/share/genpy/cmake/../../../lib/genpy/genmsg_py.py /home/tim/FDMPrinting/src/fdm_msgs/msg/GCode.msg -Ifdm_msgs:/home/tim/FDMPrinting/src/fdm_msgs/msg -Istd_msgs:/opt/ros/noetic/share/std_msgs/cmake/../msg -p fdm_msgs -o /home/tim/FDMPrinting/devel/lib/python3/dist-packages/fdm_msgs/msg
+	cd /home/tim/FDMPrinting/build/fdm_msgs && ../catkin_generated/env_cached.sh /usr/bin/python3 /opt/ros/noetic/share/genpy/cmake/../../../lib/genpy/genmsg_py.py /home/tim/FDMPrinting/src/fdm_msgs/msg/GCode.msg -Ifdm_msgs:/home/tim/FDMPrinting/src/fdm_msgs/msg -Istd_msgs:/opt/ros/noetic/share/std_msgs/cmake/../msg -Imoveit_msgs:/opt/ros/noetic/share/moveit_msgs/cmake/../msg -Iactionlib_msgs:/opt/ros/noetic/share/actionlib_msgs/cmake/../msg -Isensor_msgs:/opt/ros/noetic/share/sensor_msgs/cmake/../msg -Igeometry_msgs:/opt/ros/noetic/share/geometry_msgs/cmake/../msg -Itrajectory_msgs:/opt/ros/noetic/share/trajectory_msgs/cmake/../msg -Ishape_msgs:/opt/ros/noetic/share/shape_msgs/cmake/../msg -Iobject_recognition_msgs:/opt/ros/noetic/share/object_recognition_msgs/cmake/../msg -Ioctomap_msgs:/opt/ros/noetic/share/octomap_msgs/cmake/../msg -p fdm_msgs -o /home/tim/FDMPrinting/devel/lib/python3/dist-packages/fdm_msgs/msg
 
 /home/tim/FDMPrinting/devel/lib/python3/dist-packages/fdm_msgs/msg/_GCodeCommand.py: /opt/ros/noetic/lib/genpy/genmsg_py.py
 /home/tim/FDMPrinting/devel/lib/python3/dist-packages/fdm_msgs/msg/_GCodeCommand.py: /home/tim/FDMPrinting/src/fdm_msgs/msg/GCodeCommand.msg
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/home/tim/FDMPrinting/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Generating Python from MSG fdm_msgs/GCodeCommand"
-	cd /home/tim/FDMPrinting/build/fdm_msgs && ../catkin_generated/env_cached.sh /usr/bin/python3 /opt/ros/noetic/share/genpy/cmake/../../../lib/genpy/genmsg_py.py /home/tim/FDMPrinting/src/fdm_msgs/msg/GCodeCommand.msg -Ifdm_msgs:/home/tim/FDMPrinting/src/fdm_msgs/msg -Istd_msgs:/opt/ros/noetic/share/std_msgs/cmake/../msg -p fdm_msgs -o /home/tim/FDMPrinting/devel/lib/python3/dist-packages/fdm_msgs/msg
+	cd /home/tim/FDMPrinting/build/fdm_msgs && ../catkin_generated/env_cached.sh /usr/bin/python3 /opt/ros/noetic/share/genpy/cmake/../../../lib/genpy/genmsg_py.py /home/tim/FDMPrinting/src/fdm_msgs/msg/GCodeCommand.msg -Ifdm_msgs:/home/tim/FDMPrinting/src/fdm_msgs/msg -Istd_msgs:/opt/ros/noetic/share/std_msgs/cmake/../msg -Imoveit_msgs:/opt/ros/noetic/share/moveit_msgs/cmake/../msg -Iactionlib_msgs:/opt/ros/noetic/share/actionlib_msgs/cmake/../msg -Isensor_msgs:/opt/ros/noetic/share/sensor_msgs/cmake/../msg -Igeometry_msgs:/opt/ros/noetic/share/geometry_msgs/cmake/../msg -Itrajectory_msgs:/opt/ros/noetic/share/trajectory_msgs/cmake/../msg -Ishape_msgs:/opt/ros/noetic/share/shape_msgs/cmake/../msg -Iobject_recognition_msgs:/opt/ros/noetic/share/object_recognition_msgs/cmake/../msg -Ioctomap_msgs:/opt/ros/noetic/share/octomap_msgs/cmake/../msg -p fdm_msgs -o /home/tim/FDMPrinting/devel/lib/python3/dist-packages/fdm_msgs/msg
+
+/home/tim/FDMPrinting/devel/lib/python3/dist-packages/fdm_msgs/msg/_MovementPlan.py: /opt/ros/noetic/lib/genpy/genmsg_py.py
+/home/tim/FDMPrinting/devel/lib/python3/dist-packages/fdm_msgs/msg/_MovementPlan.py: /home/tim/FDMPrinting/src/fdm_msgs/msg/MovementPlan.msg
+/home/tim/FDMPrinting/devel/lib/python3/dist-packages/fdm_msgs/msg/_MovementPlan.py: /opt/ros/noetic/share/std_msgs/msg/Header.msg
+/home/tim/FDMPrinting/devel/lib/python3/dist-packages/fdm_msgs/msg/_MovementPlan.py: /opt/ros/noetic/share/trajectory_msgs/msg/MultiDOFJointTrajectoryPoint.msg
+/home/tim/FDMPrinting/devel/lib/python3/dist-packages/fdm_msgs/msg/_MovementPlan.py: /opt/ros/noetic/share/geometry_msgs/msg/Quaternion.msg
+/home/tim/FDMPrinting/devel/lib/python3/dist-packages/fdm_msgs/msg/_MovementPlan.py: /opt/ros/noetic/share/geometry_msgs/msg/Transform.msg
+/home/tim/FDMPrinting/devel/lib/python3/dist-packages/fdm_msgs/msg/_MovementPlan.py: /opt/ros/noetic/share/moveit_msgs/msg/RobotTrajectory.msg
+/home/tim/FDMPrinting/devel/lib/python3/dist-packages/fdm_msgs/msg/_MovementPlan.py: /opt/ros/noetic/share/geometry_msgs/msg/Twist.msg
+/home/tim/FDMPrinting/devel/lib/python3/dist-packages/fdm_msgs/msg/_MovementPlan.py: /opt/ros/noetic/share/trajectory_msgs/msg/JointTrajectoryPoint.msg
+/home/tim/FDMPrinting/devel/lib/python3/dist-packages/fdm_msgs/msg/_MovementPlan.py: /opt/ros/noetic/share/trajectory_msgs/msg/JointTrajectory.msg
+/home/tim/FDMPrinting/devel/lib/python3/dist-packages/fdm_msgs/msg/_MovementPlan.py: /opt/ros/noetic/share/trajectory_msgs/msg/MultiDOFJointTrajectory.msg
+/home/tim/FDMPrinting/devel/lib/python3/dist-packages/fdm_msgs/msg/_MovementPlan.py: /opt/ros/noetic/share/geometry_msgs/msg/Vector3.msg
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/home/tim/FDMPrinting/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Generating Python from MSG fdm_msgs/MovementPlan"
+	cd /home/tim/FDMPrinting/build/fdm_msgs && ../catkin_generated/env_cached.sh /usr/bin/python3 /opt/ros/noetic/share/genpy/cmake/../../../lib/genpy/genmsg_py.py /home/tim/FDMPrinting/src/fdm_msgs/msg/MovementPlan.msg -Ifdm_msgs:/home/tim/FDMPrinting/src/fdm_msgs/msg -Istd_msgs:/opt/ros/noetic/share/std_msgs/cmake/../msg -Imoveit_msgs:/opt/ros/noetic/share/moveit_msgs/cmake/../msg -Iactionlib_msgs:/opt/ros/noetic/share/actionlib_msgs/cmake/../msg -Isensor_msgs:/opt/ros/noetic/share/sensor_msgs/cmake/../msg -Igeometry_msgs:/opt/ros/noetic/share/geometry_msgs/cmake/../msg -Itrajectory_msgs:/opt/ros/noetic/share/trajectory_msgs/cmake/../msg -Ishape_msgs:/opt/ros/noetic/share/shape_msgs/cmake/../msg -Iobject_recognition_msgs:/opt/ros/noetic/share/object_recognition_msgs/cmake/../msg -Ioctomap_msgs:/opt/ros/noetic/share/octomap_msgs/cmake/../msg -p fdm_msgs -o /home/tim/FDMPrinting/devel/lib/python3/dist-packages/fdm_msgs/msg
 
 /home/tim/FDMPrinting/devel/lib/python3/dist-packages/fdm_msgs/msg/__init__.py: /opt/ros/noetic/lib/genpy/genmsg_py.py
 /home/tim/FDMPrinting/devel/lib/python3/dist-packages/fdm_msgs/msg/__init__.py: /home/tim/FDMPrinting/devel/lib/python3/dist-packages/fdm_msgs/msg/_GCode.py
 /home/tim/FDMPrinting/devel/lib/python3/dist-packages/fdm_msgs/msg/__init__.py: /home/tim/FDMPrinting/devel/lib/python3/dist-packages/fdm_msgs/msg/_GCodeCommand.py
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/home/tim/FDMPrinting/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Generating Python msg __init__.py for fdm_msgs"
+/home/tim/FDMPrinting/devel/lib/python3/dist-packages/fdm_msgs/msg/__init__.py: /home/tim/FDMPrinting/devel/lib/python3/dist-packages/fdm_msgs/msg/_MovementPlan.py
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/home/tim/FDMPrinting/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Generating Python msg __init__.py for fdm_msgs"
 	cd /home/tim/FDMPrinting/build/fdm_msgs && ../catkin_generated/env_cached.sh /usr/bin/python3 /opt/ros/noetic/share/genpy/cmake/../../../lib/genpy/genmsg_py.py -o /home/tim/FDMPrinting/devel/lib/python3/dist-packages/fdm_msgs/msg --initpy
 
 fdm_msgs_generate_messages_py: fdm_msgs/CMakeFiles/fdm_msgs_generate_messages_py
 fdm_msgs_generate_messages_py: /home/tim/FDMPrinting/devel/lib/python3/dist-packages/fdm_msgs/msg/_GCode.py
 fdm_msgs_generate_messages_py: /home/tim/FDMPrinting/devel/lib/python3/dist-packages/fdm_msgs/msg/_GCodeCommand.py
+fdm_msgs_generate_messages_py: /home/tim/FDMPrinting/devel/lib/python3/dist-packages/fdm_msgs/msg/_MovementPlan.py
 fdm_msgs_generate_messages_py: /home/tim/FDMPrinting/devel/lib/python3/dist-packages/fdm_msgs/msg/__init__.py
 fdm_msgs_generate_messages_py: fdm_msgs/CMakeFiles/fdm_msgs_generate_messages_py.dir/build.make
 

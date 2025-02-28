@@ -45,6 +45,7 @@ if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_
   file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/fdm_msgs/msg" TYPE FILE FILES
     "/home/tim/FDMPrinting/src/fdm_msgs/msg/GCode.msg"
     "/home/tim/FDMPrinting/src/fdm_msgs/msg/GCodeCommand.msg"
+    "/home/tim/FDMPrinting/src/fdm_msgs/msg/MovementPlan.msg"
     )
 endif()
 
