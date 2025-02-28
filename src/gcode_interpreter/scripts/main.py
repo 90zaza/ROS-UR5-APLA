@@ -38,9 +38,11 @@ class Communication:
         gcode_msg = fdm_msgs.msg.GCode()
         gcode_msg.lines = lines
         self.gcode_publisher.publish(gcode_msg)
+        rospy.sleep(0.01)
 
     def publish_movement_plan_request(self, cmd):
         self.movementPlanRequest_publisher.publish(cmd)
+        rospy.sleep(0.01)
 
 
 class GCodeInterpreter:

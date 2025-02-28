@@ -2,6 +2,7 @@
 import rospy
 import copy
 import json
+import math
 import std_msgs.msg
 import fdm_msgs.msg
 import moveit_msgs.msg
@@ -41,15 +42,15 @@ class Communication:
 
         return
     
-    def publish_gcode_command(self, command):
-        self.gcode_command_pub.publish(command)
+    def publish_toolpath_plan(self, command):
+        self.movementPlanResponse_publisher.publish(command)
         rospy.sleep(0.01)
 
         return
     
-class toolpathPlan:
-    def __init__(self):
-        # mc.roscpp_initialize(sys.argv)
+class ToolpathPlanner:
+    def __init__(self, communication):
+        self.comms = communication
                 
         self.robot = mc.RobotCommander()
         self.psi = mc.PlanningSceneInterface()
@@ -81,6 +82,13 @@ class toolpathPlan:
                             'wrist_1_joint',
                             'wrist_2_joint',
                             'wrist_3_joint']
+        #This is the home position
+        self.joint_state.position = [1.5708,
+                            -1.5708,
+                            1.5708,
+                            4.7124,
+                            4.7124,
+                            0]
 
         self.trajectory_list = []
         self.last_time = rospy.Duration(0)
@@ -89,56 +97,54 @@ class toolpathPlan:
         self.display_trajectory.trajectory_start = self.robot.get_current_state()
 
         return
-    
-    def subscriber(self):
-        rospy.Subscriber("gcode_movement", String, self.robotPosition)
-        rospy.Subscriber("gcode_printing", String)
 
-        rospy.spin()
+    def robotPosition(self, cmd):
+        if cmd.is_final:
+            self.showPlan()
+        if cmd["movement"]["f"] is not math.nan:
+            self.move_group.limit_max_cartesian_link_speed(data["movement"]["f"] * 1.66666667e-5, link_name='tcp')
 
-        return
-
-    def robotPosition(self, data):
-        data = json.loads(data.data)
-        if data:
-            if data["movement"]["f"] is not None:
-                self.move_group.limit_max_cartesian_link_speed(data["movement"]["f"] * 1.66666667e-5, link_name='tcp')
-
-            if data["movement"]["x"] is not None:
-                self.pose_goal.position.x = data["movement"]["x"] * 0.001
-            
-            if data["movement"]["y"] is not None:
-                self.pose_goal.position.y = data["movement"]["y"] * 0.001
-
-            if data["movement"]["z"] is not None:
-                self.pose_goal.position.z = data["movement"]["z"] * 0.001
+        if cmd["movement"]["x"] is not math.nan:
+            self.pose_goal.position.x = data["movement"]["x"] * 0.001
         
-            if data["comment"] == "End of Gcode":
-                self.showPlan()
-            else:
-                self.computePlan()
+        if cmd["movement"]["y"] is not math.nan:
+            self.pose_goal.position.y = data["movement"]["y"] * 0.001
+
+        if cmd["movement"]["z"] is not math.nan:
+            self.pose_goal.position.z = data["movement"]["z"] * 0.001
+    
+        
+        else:
+            self.computePlan()
         return
     
-    def computePlan(self):
+    def computePlanJoint(self):
+        (self.success, self.plan, self.time, self.error) = self.move_group.plan(self.joint_state)
+        self.setStartState()
+        return
+
+    def computePlanPose(self):
         (self.plan, self.fraction) = self.move_group.compute_cartesian_path(
                                        [copy.deepcopy(self.pose_goal)],
                                        0.01,
                                        False)
+        self.setStartState()
+        return
         
+    def setStartState(self):
         self.latest_joint_positions = copy.deepcopy(self.plan).joint_trajectory.points[-1].positions
         self.joint_state.position = copy.deepcopy(self.latest_joint_positions)
         self.robot_state.joint_state = copy.deepcopy(self.joint_state)
         self.move_group.set_start_state(copy.deepcopy(self.robot_state))
         
-        if self.fraction > 0:
-            for point in self.plan.joint_trajectory.points:
-                if point.time_from_start.to_sec() == 0:
-                    point.time_from_start += rospy.Duration(nsecs=1)
-                point.time_from_start += self.last_time
-            
-            self.last_time = self.plan.joint_trajectory.points[-1].time_from_start
-            self.trajectory_list.append(copy.deepcopy(self.plan))
-    
+        for point in self.plan.joint_trajectory.points:
+            if point.time_from_start.to_sec() == 0:
+                point.time_from_start += rospy.Duration(nsecs=1)
+            point.time_from_start += self.last_time
+        
+        self.last_time = self.plan.joint_trajectory.points[-1].time_from_start
+        self.trajectory_list.append(copy.deepcopy(self.plan))
+
     def showPlan(self):
         print('Displaying trajectory!')
         print(len(self.trajectory_list))
@@ -171,9 +177,13 @@ def main():
     rospy.init_node('toolpathPlan', anonymous=True)
 
     comms = Communication()
-    toolpathPlan = ToolpathPlan(comms)
+    toolpathPlanner = ToolpathPlanner(comms)
 
+    comms.set_class_pointers(toolpathPlanner)
+    comms.set_subscribers()
+    comms.wait_for_publishers()
+
+    rospy.spin()
 
 if __name__ == '__main__':
-    toolpathPlan = toolpathPlan()
-    toolpathPlan.subscriber()
+    main()
