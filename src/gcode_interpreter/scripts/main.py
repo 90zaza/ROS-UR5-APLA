@@ -86,6 +86,11 @@ class ToolpathPlanner:
         print("No missing seq_id(s) detected.")
 
         movementCommands = self.filterMovement(self.gcodeCommandList)
+
+        for cmd in movementCommands:
+            self.comms.publish_movement_plan_request(cmd)
+            print(cmd)
+
         print(self.consecutiveMovementSequence(movementCommands))
 
     def filterMovement(self, gcodeCommandList):

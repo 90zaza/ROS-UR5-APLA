@@ -59,6 +59,9 @@ class GCodeInterpreter:
             command = parts[0].strip()
             if comment == "End of Gcode":
                 gcodeCommand_msg.is_final = True
+                gcodeCommand_msg.has_movement = True
+                gcodeCommand_msg.has_printing = True
+                gcodeCommand_msg.seq_id = self.seq_id
                 self.comms.publish_gcode_command(gcodeCommand_msg)
             if len(command) == 0:
                 self.cmd_id += 1

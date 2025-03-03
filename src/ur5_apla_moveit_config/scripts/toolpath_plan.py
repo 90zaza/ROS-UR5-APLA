@@ -28,7 +28,7 @@ class Communication:
         return
     
     def set_subscribers(self):
-        rospy.Subscriber("movement_plan_request", fdm_msgs.msg.GCodeCommand, self.toolpathPlanner.robotPosition())
+        rospy.Subscriber("movement_plan_request", fdm_msgs.msg.GCodeCommand, self.toolpathPlanner.robotPosition)
 
         return
     
@@ -60,11 +60,11 @@ class ToolpathPlanner:
         self.move_group.limit_max_cartesian_link_speed(0.3, link_name='tcp')
         self.move_group.set_max_acceleration_scaling_factor(0.1)
 
-        # initialize standard position robotic arm
+        # initialize "Home" position robotic arm, in frame 'buildPlate'
         self.pose_goal = geometry_msgs.msg.Pose()
-        self.pose_goal.position.x = 0
-        self.pose_goal.position.y = 0
-        self.pose_goal.position.z = 0.2
+        self.pose_goal.position.x = 0.2620
+        self.pose_goal.position.y = 0.1636
+        self.pose_goal.position.z = 0.2228
         self.quaternion = quaternion_from_euler(pi, 0, pi)
         self.pose_goal.orientation.x = self.quaternion[0]
         self.pose_goal.orientation.y = self.quaternion[1]
@@ -93,6 +93,8 @@ class ToolpathPlanner:
         self.trajectory_list = []
         self.last_time = rospy.Duration(0)
 
+        self.computePlanJoint()
+
         self.display_trajectory = moveit_msgs.msg.DisplayTrajectory()
         self.display_trajectory.trajectory_start = self.robot.get_current_state()
 
@@ -101,25 +103,23 @@ class ToolpathPlanner:
     def robotPosition(self, cmd):
         if cmd.is_final:
             self.showPlan()
-        if cmd["movement"]["f"] is not math.nan:
-            self.move_group.limit_max_cartesian_link_speed(data["movement"]["f"] * 1.66666667e-5, link_name='tcp')
-
-        if cmd["movement"]["x"] is not math.nan:
-            self.pose_goal.position.x = data["movement"]["x"] * 0.001
+            return
+        if not math.isnan(cmd.f):
+            self.move_group.limit_max_cartesian_link_speed(cmd.f * 1.66666667e-5, link_name='tcp')
+        if not math.isnan(cmd.x):
+            self.pose_goal.position.x = cmd.x * 0.001
         
-        if cmd["movement"]["y"] is not math.nan:
-            self.pose_goal.position.y = data["movement"]["y"] * 0.001
+        if not math.isnan(cmd.y):
+            self.pose_goal.position.y = cmd.y * 0.001
 
-        if cmd["movement"]["z"] is not math.nan:
-            self.pose_goal.position.z = data["movement"]["z"] * 0.001
+        if not math.isnan(cmd.z):
+            self.pose_goal.position.z = cmd.z * 0.001
     
-        
-        else:
-            self.computePlan()
+        self.computePlanPose()
         return
     
     def computePlanJoint(self):
-        (self.success, self.plan, self.time, self.error) = self.move_group.plan(self.joint_state)
+        (self.success, self.plan, self.time, self.error) = self.move_group.plan(copy.deepcopy(self.joint_state))
         self.setStartState()
         return
 
@@ -128,6 +128,7 @@ class ToolpathPlanner:
                                        [copy.deepcopy(self.pose_goal)],
                                        0.01,
                                        False)
+        print(self.plan)
         self.setStartState()
         return
         
@@ -144,6 +145,8 @@ class ToolpathPlanner:
         
         self.last_time = self.plan.joint_trajectory.points[-1].time_from_start
         self.trajectory_list.append(copy.deepcopy(self.plan))
+        print(f'Length TL: {len(self.trajectory_list)}\n')
+        return
 
     def showPlan(self):
         print('Displaying trajectory!')
@@ -152,8 +155,9 @@ class ToolpathPlanner:
         for plan in self.trajectory_list:
             self.display_trajectory.trajectory.append(plan)
 
-        print(self.display_trajectory)
-        self.display_trajectory_publisher.publish(self.display_trajectory)
+        # print(len(self.display_trajectory))
+        # print(self.display_trajectory)
+        self.comms.display_trajectory_publisher.publish(self.display_trajectory)
 
         input("Press Enter to execute the trajectory...")
         self.executePlan()
@@ -181,7 +185,7 @@ def main():
 
     comms.set_class_pointers(toolpathPlanner)
     comms.set_subscribers()
-    comms.wait_for_publishers()
+    # comms.wait_for_publishers()
 
     rospy.spin()
 

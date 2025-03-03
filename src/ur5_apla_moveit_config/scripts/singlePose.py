@@ -145,9 +145,25 @@ if __name__ == '__main__':
     move_group.execute(plan, wait=False)
     move_group.stop()
 
-    print(f'World: {move_group.get_current_pose().pose}\n')
+    poseWorld = move_group.get_current_pose()
     move_group.set_pose_reference_frame('buildPlate')
-    print(f'buildPlate: {move_group.get_current_pose().pose}')
+    posebuildPlate = move_group.get_current_pose()
+    print(f'World: {poseWorld.pose}\n')
+    print(f'buildPlate: {posebuildPlate.pose}\n')
+
+    tf_buffer = tf2_ros.Buffer()  # tf buffer length
+    tf_listener = tf2_ros.TransformListener(tf_buffer)
+
+    rospy.sleep(1.0)
+
+    transform = tf_buffer.lookup_transform(
+        'buildPlate',
+        'world',
+        rospy.Time(0),
+        rospy.Duration(1.0))
+
+    pose_transformed = tf2_geometry_msgs.do_transform_pose(poseWorld, transform)
+    print(f'buildPlate - real: {pose_transformed.pose}')
 
 
     # rospy.loginfo("Executing Cartesian Path at Controlled Speed...")
