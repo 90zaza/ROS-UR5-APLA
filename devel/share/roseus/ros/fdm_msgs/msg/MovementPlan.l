@@ -16,26 +16,26 @@
 
 (defclass fdm_msgs::MovementPlan
   :super ros::object
-  :slots (_seq_ids _execution_times _trajectory ))
+  :slots (_seq_id _execution_time _trajectory ))
 
 (defmethod fdm_msgs::MovementPlan
   (:init
    (&key
-    ((:seq_ids __seq_ids) (make-array 0 :initial-element 0 :element-type :integer))
-    ((:execution_times __execution_times) (make-array 0 :initial-element 0.0 :element-type :float))
+    ((:seq_id __seq_id) 0)
+    ((:execution_time __execution_time) (instance ros::time :init))
     ((:trajectory __trajectory) (instance moveit_msgs::RobotTrajectory :init))
     )
    (send-super :init)
-   (setq _seq_ids __seq_ids)
-   (setq _execution_times __execution_times)
+   (setq _seq_id (round __seq_id))
+   (setq _execution_time __execution_time)
    (setq _trajectory __trajectory)
    self)
-  (:seq_ids
-   (&optional __seq_ids)
-   (if __seq_ids (setq _seq_ids __seq_ids)) _seq_ids)
-  (:execution_times
-   (&optional __execution_times)
-   (if __execution_times (setq _execution_times __execution_times)) _execution_times)
+  (:seq_id
+   (&optional __seq_id)
+   (if __seq_id (setq _seq_id __seq_id)) _seq_id)
+  (:execution_time
+   (&optional __execution_time)
+   (if __execution_time (setq _execution_time __execution_time)) _execution_time)
   (:trajectory
    (&rest __trajectory)
    (if (keywordp (car __trajectory))
@@ -46,10 +46,10 @@
   (:serialization-length
    ()
    (+
-    ;; int32[] _seq_ids
-    (* 4    (length _seq_ids)) 4
-    ;; float64[] _execution_times
-    (* 8    (length _execution_times)) 4
+    ;; int32 _seq_id
+    4
+    ;; duration _execution_time
+    8
     ;; moveit_msgs/RobotTrajectory _trajectory
     (send _trajectory :serialization-length)
     ))
@@ -57,48 +57,32 @@
    (&optional strm)
    (let ((s (if strm strm
               (make-string-output-stream (send self :serialization-length)))))
-     ;; int32[] _seq_ids
-     (write-long (length _seq_ids) s)
-     (dotimes (i (length _seq_ids))
-       (write-long (elt _seq_ids i) s)
-       )
-     ;; float64[] _execution_times
-     (write-long (length _execution_times) s)
-     (dotimes (i (length _execution_times))
-       (sys::poke (elt _execution_times i) (send s :buffer) (send s :count) :double) (incf (stream-count s) 8)
-       )
+     ;; int32 _seq_id
+       (write-long _seq_id s)
+     ;; duration _execution_time
+       (write-long (send _execution_time :sec) s) (write-long (send _execution_time :nsec) s)
      ;; moveit_msgs/RobotTrajectory _trajectory
        (send _trajectory :serialize s)
      ;;
      (if (null strm) (get-output-stream-string s))))
   (:deserialize
    (buf &optional (ptr- 0))
-   ;; int32[] _seq_ids
-   (let (n)
-     (setq n (sys::peek buf ptr- :integer)) (incf ptr- 4)
-     (setq _seq_ids (instantiate integer-vector n))
-     (dotimes (i n)
-     (setf (elt _seq_ids i) (sys::peek buf ptr- :integer)) (incf ptr- 4)
-     ))
-   ;; float64[] _execution_times
-   (let (n)
-     (setq n (sys::peek buf ptr- :integer)) (incf ptr- 4)
-     (setq _execution_times (instantiate float-vector n))
-     (dotimes (i n)
-     (setf (elt _execution_times i) (sys::peek buf ptr- :double)) (incf ptr- 8)
-     ))
+   ;; int32 _seq_id
+     (setq _seq_id (sys::peek buf ptr- :integer)) (incf ptr- 4)
+   ;; duration _execution_time
+     (send _execution_time :sec (sys::peek buf ptr- :integer)) (incf ptr- 4)  (send _execution_time :nsec (sys::peek buf ptr- :integer)) (incf ptr- 4)
    ;; moveit_msgs/RobotTrajectory _trajectory
      (send _trajectory :deserialize buf ptr-) (incf ptr- (send _trajectory :serialization-length))
    ;;
    self)
   )
 
-(setf (get fdm_msgs::MovementPlan :md5sum-) "bb27415c930ac47c69fa82e8b7dc0ccd")
+(setf (get fdm_msgs::MovementPlan :md5sum-) "6f421bb5afab38c9bd55dc301c0151a4")
 (setf (get fdm_msgs::MovementPlan :datatype-) "fdm_msgs/MovementPlan")
 (setf (get fdm_msgs::MovementPlan :definition-)
       "# MovementPlan.msg
-int32[] seq_ids  # Sequence IDs to match each movement command
-float64[] execution_times  # Corresponding execution times
+int32 seq_id  # Sequence IDs to match each movement command
+duration execution_time  # Corresponding execution times
 moveit_msgs/RobotTrajectory trajectory  # Using an external message type
 
 ================================================================================
@@ -204,6 +188,6 @@ Vector3  angular
 
 
 
-(provide :fdm_msgs/MovementPlan "bb27415c930ac47c69fa82e8b7dc0ccd")
+(provide :fdm_msgs/MovementPlan "6f421bb5afab38c9bd55dc301c0151a4")
 
 

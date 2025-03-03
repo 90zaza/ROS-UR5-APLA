@@ -91,13 +91,20 @@ class ToolpathPlanner:
                             0]
 
         self.trajectory_list = []
-        self.last_time = rospy.Duration(0)
+        # self.last_time = rospy.Duration(0)
 
-        self.computePlanJoint()
+        self.goToHome()
+
+        self.movementPlanMSG = fdm_msgs.msg.MovementPlan()
 
         self.display_trajectory = moveit_msgs.msg.DisplayTrajectory()
         self.display_trajectory.trajectory_start = self.robot.get_current_state()
 
+        return
+    
+    def goToHome(self):
+        self.move_group.go(copy.deepcopy(self.joint_state))
+        self.move_group.stop()
         return
 
     def robotPosition(self, cmd):
@@ -114,13 +121,8 @@ class ToolpathPlanner:
 
         if not math.isnan(cmd.z):
             self.pose_goal.position.z = cmd.z * 0.001
-    
+        self.movementPlanMSG.seq_id = cmd.seq_id
         self.computePlanPose()
-        return
-    
-    def computePlanJoint(self):
-        (self.success, self.plan, self.time, self.error) = self.move_group.plan(copy.deepcopy(self.joint_state))
-        self.setStartState()
         return
 
     def computePlanPose(self):
@@ -128,7 +130,9 @@ class ToolpathPlanner:
                                        [copy.deepcopy(self.pose_goal)],
                                        0.01,
                                        False)
-        print(self.plan)
+        self.movementPlanMSG.trajectory = self.plan
+        self.movementPlanMSG.execution_time = self.plan.joint_trajectory.points[-1].time_from_start
+        self.comms.publish_toolpath_plan(self.movementPlanMSG)
         self.setStartState()
         return
         
@@ -137,20 +141,11 @@ class ToolpathPlanner:
         self.joint_state.position = copy.deepcopy(self.latest_joint_positions)
         self.robot_state.joint_state = copy.deepcopy(self.joint_state)
         self.move_group.set_start_state(copy.deepcopy(self.robot_state))
-        
-        for point in self.plan.joint_trajectory.points:
-            if point.time_from_start.to_sec() == 0:
-                point.time_from_start += rospy.Duration(nsecs=1)
-            point.time_from_start += self.last_time
-        
-        self.last_time = self.plan.joint_trajectory.points[-1].time_from_start
         self.trajectory_list.append(copy.deepcopy(self.plan))
-        print(f'Length TL: {len(self.trajectory_list)}\n')
         return
 
     def showPlan(self):
-        print('Displaying trajectory!')
-        print(len(self.trajectory_list))
+        print(f'Displaying trajectory of {len(self.trajectory_list)} sub-points!')
 
         for plan in self.trajectory_list:
             self.display_trajectory.trajectory.append(plan)
@@ -159,8 +154,8 @@ class ToolpathPlanner:
         # print(self.display_trajectory)
         self.comms.display_trajectory_publisher.publish(self.display_trajectory)
 
-        input("Press Enter to execute the trajectory...")
-        self.executePlan()
+        # input("Press Enter to execute the trajectory...")
+        # self.executePlan()
 
     def executePlan(self):
         if not self.trajectory_list:
@@ -185,7 +180,7 @@ def main():
 
     comms.set_class_pointers(toolpathPlanner)
     comms.set_subscribers()
-    # comms.wait_for_publishers()
+    comms.wait_for_publishers()
 
     rospy.spin()
 

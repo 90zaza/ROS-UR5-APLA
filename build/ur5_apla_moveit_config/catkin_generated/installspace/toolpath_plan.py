@@ -2,6 +2,7 @@
 import rospy
 import copy
 import json
+import math
 import std_msgs.msg
 import fdm_msgs.msg
 import moveit_msgs.msg
@@ -27,7 +28,7 @@ class Communication:
         return
     
     def set_subscribers(self):
-        rospy.Subscriber("movement_plan_request", fdm_msgs.msg.GCodeCommand, self.toolpathPlanner.robotPosition())
+        rospy.Subscriber("movement_plan_request", fdm_msgs.msg.GCodeCommand, self.toolpathPlanner.robotPosition)
 
         return
     
@@ -41,8 +42,8 @@ class Communication:
 
         return
     
-    def publish_gcode_command(self, command):
-        self.gcode_command_pub.publish(command)
+    def publish_toolpath_plan(self, command):
+        self.movementPlanResponse_publisher.publish(command)
         rospy.sleep(0.01)
 
         return
@@ -59,11 +60,11 @@ class ToolpathPlanner:
         self.move_group.limit_max_cartesian_link_speed(0.3, link_name='tcp')
         self.move_group.set_max_acceleration_scaling_factor(0.1)
 
-        # initialize standard position robotic arm
+        # initialize "Home" position robotic arm, in frame 'buildPlate'
         self.pose_goal = geometry_msgs.msg.Pose()
-        self.pose_goal.position.x = 0
-        self.pose_goal.position.y = 0
-        self.pose_goal.position.z = 0.2
+        self.pose_goal.position.x = 0.2620
+        self.pose_goal.position.y = 0.1636
+        self.pose_goal.position.z = 0.2228
         self.quaternion = quaternion_from_euler(pi, 0, pi)
         self.pose_goal.orientation.x = self.quaternion[0]
         self.pose_goal.orientation.y = self.quaternion[1]
@@ -81,68 +82,87 @@ class ToolpathPlanner:
                             'wrist_1_joint',
                             'wrist_2_joint',
                             'wrist_3_joint']
+        #This is the home position
+        self.joint_state.position = [1.5708,
+                            -1.5708,
+                            1.5708,
+                            4.7124,
+                            4.7124,
+                            0]
 
         self.trajectory_list = []
-        self.last_time = rospy.Duration(0)
+        # self.last_time = rospy.Duration(0)
+
+        self.goToHome()
+
+        self.movementPlanMSG = fdm_msgs.msg.MovementPlan()
 
         self.display_trajectory = moveit_msgs.msg.DisplayTrajectory()
         self.display_trajectory.trajectory_start = self.robot.get_current_state()
 
         return
-
-    def robotPosition(self, data):
-        data = json.loads(data.data)
-        if data:
-            if data["movement"]["f"] is not None:
-                self.move_group.limit_max_cartesian_link_speed(data["movement"]["f"] * 1.66666667e-5, link_name='tcp')
-
-            if data["movement"]["x"] is not None:
-                self.pose_goal.position.x = data["movement"]["x"] * 0.001
-            
-            if data["movement"]["y"] is not None:
-                self.pose_goal.position.y = data["movement"]["y"] * 0.001
-
-            if data["movement"]["z"] is not None:
-                self.pose_goal.position.z = data["movement"]["z"] * 0.001
-        
-            if data["comment"] == "End of Gcode":
-                self.showPlan()
-            else:
-                self.computePlan()
-        return
     
-    def computePlan(self):
+    def goToHome(self):
+        self.move_group.go(copy.deepcopy(self.joint_state))
+        self.move_group.stop()
+        return
+
+    def robotPosition(self, cmd):
+        if cmd.is_final:
+            self.showPlan()
+            return
+        if not math.isnan(cmd.f):
+            self.move_group.limit_max_cartesian_link_speed(cmd.f * 1.66666667e-5, link_name='tcp')
+        if not math.isnan(cmd.x):
+            self.pose_goal.position.x = cmd.x * 0.001
+        
+        if not math.isnan(cmd.y):
+            self.pose_goal.position.y = cmd.y * 0.001
+
+        if not math.isnan(cmd.z):
+            self.pose_goal.position.z = cmd.z * 0.001
+        self.movementPlanMSG.seq_id = cmd.seq_id
+        self.computePlanPose()
+        return
+
+    def computePlanPose(self):
         (self.plan, self.fraction) = self.move_group.compute_cartesian_path(
                                        [copy.deepcopy(self.pose_goal)],
                                        0.01,
                                        False)
+        self.movementPlanMSG.trajectory = self.plan
+        self.movementPlanMSG.execution_times = float(self.plan.joint_trajectory.points[-1].time_from_start)
+        self.comms.publish_toolpath_plan(self.movementPlanMSG)
+        self.setStartState()
+        return
         
+    def setStartState(self):
         self.latest_joint_positions = copy.deepcopy(self.plan).joint_trajectory.points[-1].positions
         self.joint_state.position = copy.deepcopy(self.latest_joint_positions)
         self.robot_state.joint_state = copy.deepcopy(self.joint_state)
         self.move_group.set_start_state(copy.deepcopy(self.robot_state))
         
-        if self.fraction > 0:
-            for point in self.plan.joint_trajectory.points:
-                if point.time_from_start.to_sec() == 0:
-                    point.time_from_start += rospy.Duration(nsecs=1)
-                point.time_from_start += self.last_time
-            
-            self.last_time = self.plan.joint_trajectory.points[-1].time_from_start
-            self.trajectory_list.append(copy.deepcopy(self.plan))
-    
+        # for point in self.plan.joint_trajectory.points:
+        #     if point.time_from_start.to_sec() == 0:
+        #         point.time_from_start += rospy.Duration(nsecs=1)
+        #     point.time_from_start += self.last_time
+        
+        # self.last_time = self.plan.joint_trajectory.points[-1].time_from_start
+        self.trajectory_list.append(copy.deepcopy(self.plan))
+        return
+
     def showPlan(self):
-        print('Displaying trajectory!')
-        print(len(self.trajectory_list))
+        print(f'Displaying trajectory of {len(self.trajectory_list)} sub-points!')
 
         for plan in self.trajectory_list:
             self.display_trajectory.trajectory.append(plan)
 
-        print(self.display_trajectory)
-        self.display_trajectory_publisher.publish(self.display_trajectory)
+        # print(len(self.display_trajectory))
+        # print(self.display_trajectory)
+        self.comms.display_trajectory_publisher.publish(self.display_trajectory)
 
-        input("Press Enter to execute the trajectory...")
-        self.executePlan()
+        # input("Press Enter to execute the trajectory...")
+        # self.executePlan()
 
     def executePlan(self):
         if not self.trajectory_list:
@@ -172,5 +192,4 @@ def main():
     rospy.spin()
 
 if __name__ == '__main__':
-    toolpathPlan = toolpathPlan()
-    toolpathPlan.subscriber()
+    main()

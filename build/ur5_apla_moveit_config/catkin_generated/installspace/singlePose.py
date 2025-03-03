@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 
+import tf2_ros
+import tf2_geometry_msgs
 import sys
 import rospy
 import moveit_commander as mc
@@ -53,7 +55,7 @@ if __name__ == '__main__':
     move_group.set_max_acceleration_scaling_factor(1.0)  # Fastest acceleration
 
     waypoints = []
-    move_group.set_pose_reference_frame('buildPlate')
+    # move_group.set_pose_reference_frame('buildPlate')
 
     # Planning a square
     # wpose = move_group.get_current_pose().pose
@@ -88,29 +90,36 @@ if __name__ == '__main__':
 
     # move_group.set_joint_value_target({"wrist_3_joint": 0})
 
-    # joint_state = sensor_msgs.msg.JointState()
-    # joint_state.header = std_msgs.msg.Header()
-    # joint_state.header.stamp = rospy.Time.now()
-    # joint_state.name = ['shoulder_pan_joint',
-    #                     'shoulder_lift_joint',
-    #                     'elbow_joint',
-    #                     'wrist_1_joint',
-    #                     'wrist_2_joint',
-    #                     'wrist_3_joint']
-    # #This is the switch_printhead position
+    joint_state = sensor_msgs.msg.JointState()
+    joint_state.header = std_msgs.msg.Header()
+    joint_state.header.stamp = rospy.Time.now()
+    joint_state.name = ['shoulder_pan_joint',
+                        'shoulder_lift_joint',
+                        'elbow_joint',
+                        'wrist_1_joint',
+                        'wrist_2_joint',
+                        'wrist_3_joint']
+    #This is the switch_printhead position
     # joint_state.position = [1.1781,
     #                         -1.5708,
     #                         1.5708,
     #                         3.1415,
     #                         3.5343,
     #                         0]
-    # robot_state = moveit_msgs.msg.RobotState()
-    # robot_state.joint_state = joint_state
+    #This is the home position
+    joint_state.position = [1.5708,
+                            -1.5708,
+                            1.5708,
+                            4.7124,
+                            4.7124,
+                            0]
+    robot_state = moveit_msgs.msg.RobotState()
+    robot_state.joint_state = joint_state
 
     # move_group.set_start_state(robot_state)
 
-    move_group.go(pose_goal, wait=True)
-    move_group.stop()
+    (success, plan, time, error) = move_group.plan(joint_state)
+    # move_group.stop()
     
     # waypoints.append(copy.deepcopy(pose_goal))
 
@@ -128,13 +137,34 @@ if __name__ == '__main__':
     # else:
     #     rospy.logwarn("Time parameterization failed! The trajectory may not execute smoothly.")
 
-    # display_trajectory = moveit_msgs.msg.DisplayTrajectory()
-    # display_trajectory.trajectory_start = robot.get_current_state()
-    # display_trajectory.trajectory.append(plan)
-    # display_trajectory_publisher.publish(display_trajectory)
+    display_trajectory = moveit_msgs.msg.DisplayTrajectory()
+    display_trajectory.trajectory_start = robot.get_current_state()
+    display_trajectory.trajectory.append(plan)
+    display_trajectory_publisher.publish(display_trajectory)
 
-    # move_group.execute(plan, wait=False)
-    # move_group.stop()
+    move_group.execute(plan, wait=False)
+    move_group.stop()
+
+    poseWorld = move_group.get_current_pose()
+    move_group.set_pose_reference_frame('buildPlate')
+    posebuildPlate = move_group.get_current_pose()
+    print(f'World: {poseWorld.pose}\n')
+    print(f'buildPlate: {posebuildPlate.pose}\n')
+
+    tf_buffer = tf2_ros.Buffer()  # tf buffer length
+    tf_listener = tf2_ros.TransformListener(tf_buffer)
+
+    rospy.sleep(1.0)
+
+    transform = tf_buffer.lookup_transform(
+        'buildPlate',
+        'world',
+        rospy.Time(0),
+        rospy.Duration(1.0))
+
+    pose_transformed = tf2_geometry_msgs.do_transform_pose(poseWorld, transform)
+    print(f'buildPlate - real: {pose_transformed.pose}')
+
 
     # rospy.loginfo("Executing Cartesian Path at Controlled Speed...")
     # move_group.execute(trajectory, wait=False)  # Execute motion *without waiting*

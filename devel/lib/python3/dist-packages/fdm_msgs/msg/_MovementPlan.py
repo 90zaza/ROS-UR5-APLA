@@ -13,12 +13,12 @@ import std_msgs.msg
 import trajectory_msgs.msg
 
 class MovementPlan(genpy.Message):
-  _md5sum = "bb27415c930ac47c69fa82e8b7dc0ccd"
+  _md5sum = "6f421bb5afab38c9bd55dc301c0151a4"
   _type = "fdm_msgs/MovementPlan"
   _has_header = False  # flag to mark the presence of a Header object
   _full_text = """# MovementPlan.msg
-int32[] seq_ids  # Sequence IDs to match each movement command
-float64[] execution_times  # Corresponding execution times
+int32 seq_id  # Sequence IDs to match each movement command
+duration execution_time  # Corresponding execution times
 moveit_msgs/RobotTrajectory trajectory  # Using an external message type
 
 ================================================================================
@@ -120,8 +120,8 @@ MSG: geometry_msgs/Twist
 Vector3  linear
 Vector3  angular
 """
-  __slots__ = ['seq_ids','execution_times','trajectory']
-  _slot_types = ['int32[]','float64[]','moveit_msgs/RobotTrajectory']
+  __slots__ = ['seq_id','execution_time','trajectory']
+  _slot_types = ['int32','duration','moveit_msgs/RobotTrajectory']
 
   def __init__(self, *args, **kwds):
     """
@@ -131,7 +131,7 @@ Vector3  angular
     changes.  You cannot mix in-order arguments and keyword arguments.
 
     The available fields are:
-       seq_ids,execution_times,trajectory
+       seq_id,execution_time,trajectory
 
     :param args: complete set of field values, in .msg order
     :param kwds: use keyword arguments corresponding to message field names
@@ -140,15 +140,15 @@ Vector3  angular
     if args or kwds:
       super(MovementPlan, self).__init__(*args, **kwds)
       # message fields cannot be None, assign default values for those that are
-      if self.seq_ids is None:
-        self.seq_ids = []
-      if self.execution_times is None:
-        self.execution_times = []
+      if self.seq_id is None:
+        self.seq_id = 0
+      if self.execution_time is None:
+        self.execution_time = genpy.Duration()
       if self.trajectory is None:
         self.trajectory = moveit_msgs.msg.RobotTrajectory()
     else:
-      self.seq_ids = []
-      self.execution_times = []
+      self.seq_id = 0
+      self.execution_time = genpy.Duration()
       self.trajectory = moveit_msgs.msg.RobotTrajectory()
 
   def _get_types(self):
@@ -163,16 +163,8 @@ Vector3  angular
     :param buff: buffer, ``StringIO``
     """
     try:
-      length = len(self.seq_ids)
-      buff.write(_struct_I.pack(length))
-      pattern = '<%si'%length
-      buff.write(struct.Struct(pattern).pack(*self.seq_ids))
-      length = len(self.execution_times)
-      buff.write(_struct_I.pack(length))
-      pattern = '<%sd'%length
-      buff.write(struct.Struct(pattern).pack(*self.execution_times))
       _x = self
-      buff.write(_get_struct_3I().pack(_x.trajectory.joint_trajectory.header.seq, _x.trajectory.joint_trajectory.header.stamp.secs, _x.trajectory.joint_trajectory.header.stamp.nsecs))
+      buff.write(_get_struct_3i3I().pack(_x.seq_id, _x.execution_time.secs, _x.execution_time.nsecs, _x.trajectory.joint_trajectory.header.seq, _x.trajectory.joint_trajectory.header.stamp.secs, _x.trajectory.joint_trajectory.header.stamp.nsecs))
       _x = self.trajectory.joint_trajectory.header.frame_id
       length = len(_x)
       if python3 or type(_x) == unicode:
@@ -269,29 +261,15 @@ Vector3  angular
     if python3:
       codecs.lookup_error("rosmsg").msg_type = self._type
     try:
+      if self.execution_time is None:
+        self.execution_time = genpy.Duration()
       if self.trajectory is None:
         self.trajectory = moveit_msgs.msg.RobotTrajectory()
       end = 0
-      start = end
-      end += 4
-      (length,) = _struct_I.unpack(str[start:end])
-      pattern = '<%si'%length
-      start = end
-      s = struct.Struct(pattern)
-      end += s.size
-      self.seq_ids = s.unpack(str[start:end])
-      start = end
-      end += 4
-      (length,) = _struct_I.unpack(str[start:end])
-      pattern = '<%sd'%length
-      start = end
-      s = struct.Struct(pattern)
-      end += s.size
-      self.execution_times = s.unpack(str[start:end])
       _x = self
       start = end
-      end += 12
-      (_x.trajectory.joint_trajectory.header.seq, _x.trajectory.joint_trajectory.header.stamp.secs, _x.trajectory.joint_trajectory.header.stamp.nsecs,) = _get_struct_3I().unpack(str[start:end])
+      end += 24
+      (_x.seq_id, _x.execution_time.secs, _x.execution_time.nsecs, _x.trajectory.joint_trajectory.header.seq, _x.trajectory.joint_trajectory.header.stamp.secs, _x.trajectory.joint_trajectory.header.stamp.nsecs,) = _get_struct_3i3I().unpack(str[start:end])
       start = end
       end += 4
       (length,) = _struct_I.unpack(str[start:end])
@@ -451,6 +429,7 @@ Vector3  angular
         end += 8
         (_x.secs, _x.nsecs,) = _get_struct_2i().unpack(str[start:end])
         self.trajectory.multi_dof_joint_trajectory.points.append(val1)
+      self.execution_time.canon()
       return self
     except struct.error as e:
       raise genpy.DeserializationError(e)  # most likely buffer underfill
@@ -463,16 +442,8 @@ Vector3  angular
     :param numpy: numpy python module
     """
     try:
-      length = len(self.seq_ids)
-      buff.write(_struct_I.pack(length))
-      pattern = '<%si'%length
-      buff.write(self.seq_ids.tostring())
-      length = len(self.execution_times)
-      buff.write(_struct_I.pack(length))
-      pattern = '<%sd'%length
-      buff.write(self.execution_times.tostring())
       _x = self
-      buff.write(_get_struct_3I().pack(_x.trajectory.joint_trajectory.header.seq, _x.trajectory.joint_trajectory.header.stamp.secs, _x.trajectory.joint_trajectory.header.stamp.nsecs))
+      buff.write(_get_struct_3i3I().pack(_x.seq_id, _x.execution_time.secs, _x.execution_time.nsecs, _x.trajectory.joint_trajectory.header.seq, _x.trajectory.joint_trajectory.header.stamp.secs, _x.trajectory.joint_trajectory.header.stamp.nsecs))
       _x = self.trajectory.joint_trajectory.header.frame_id
       length = len(_x)
       if python3 or type(_x) == unicode:
@@ -570,29 +541,15 @@ Vector3  angular
     if python3:
       codecs.lookup_error("rosmsg").msg_type = self._type
     try:
+      if self.execution_time is None:
+        self.execution_time = genpy.Duration()
       if self.trajectory is None:
         self.trajectory = moveit_msgs.msg.RobotTrajectory()
       end = 0
-      start = end
-      end += 4
-      (length,) = _struct_I.unpack(str[start:end])
-      pattern = '<%si'%length
-      start = end
-      s = struct.Struct(pattern)
-      end += s.size
-      self.seq_ids = numpy.frombuffer(str[start:end], dtype=numpy.int32, count=length)
-      start = end
-      end += 4
-      (length,) = _struct_I.unpack(str[start:end])
-      pattern = '<%sd'%length
-      start = end
-      s = struct.Struct(pattern)
-      end += s.size
-      self.execution_times = numpy.frombuffer(str[start:end], dtype=numpy.float64, count=length)
       _x = self
       start = end
-      end += 12
-      (_x.trajectory.joint_trajectory.header.seq, _x.trajectory.joint_trajectory.header.stamp.secs, _x.trajectory.joint_trajectory.header.stamp.nsecs,) = _get_struct_3I().unpack(str[start:end])
+      end += 24
+      (_x.seq_id, _x.execution_time.secs, _x.execution_time.nsecs, _x.trajectory.joint_trajectory.header.seq, _x.trajectory.joint_trajectory.header.stamp.secs, _x.trajectory.joint_trajectory.header.stamp.nsecs,) = _get_struct_3i3I().unpack(str[start:end])
       start = end
       end += 4
       (length,) = _struct_I.unpack(str[start:end])
@@ -752,6 +709,7 @@ Vector3  angular
         end += 8
         (_x.secs, _x.nsecs,) = _get_struct_2i().unpack(str[start:end])
         self.trajectory.multi_dof_joint_trajectory.points.append(val1)
+      self.execution_time.canon()
       return self
     except struct.error as e:
       raise genpy.DeserializationError(e)  # most likely buffer underfill
@@ -778,6 +736,12 @@ def _get_struct_3d():
     if _struct_3d is None:
         _struct_3d = struct.Struct("<3d")
     return _struct_3d
+_struct_3i3I = None
+def _get_struct_3i3I():
+    global _struct_3i3I
+    if _struct_3i3I is None:
+        _struct_3i3I = struct.Struct("<3i3I")
+    return _struct_3i3I
 _struct_4d = None
 def _get_struct_4d():
     global _struct_4d

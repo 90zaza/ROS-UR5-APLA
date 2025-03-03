@@ -19,22 +19,22 @@ class MovementPlan {
   constructor(initObj={}) {
     if (initObj === null) {
       // initObj === null is a special case for deserialization where we don't initialize fields
-      this.seq_ids = null;
-      this.execution_times = null;
+      this.seq_id = null;
+      this.execution_time = null;
       this.trajectory = null;
     }
     else {
-      if (initObj.hasOwnProperty('seq_ids')) {
-        this.seq_ids = initObj.seq_ids
+      if (initObj.hasOwnProperty('seq_id')) {
+        this.seq_id = initObj.seq_id
       }
       else {
-        this.seq_ids = [];
+        this.seq_id = 0;
       }
-      if (initObj.hasOwnProperty('execution_times')) {
-        this.execution_times = initObj.execution_times
+      if (initObj.hasOwnProperty('execution_time')) {
+        this.execution_time = initObj.execution_time
       }
       else {
-        this.execution_times = [];
+        this.execution_time = {secs: 0, nsecs: 0};
       }
       if (initObj.hasOwnProperty('trajectory')) {
         this.trajectory = initObj.trajectory
@@ -47,10 +47,10 @@ class MovementPlan {
 
   static serialize(obj, buffer, bufferOffset) {
     // Serializes a message object of type MovementPlan
-    // Serialize message field [seq_ids]
-    bufferOffset = _arraySerializer.int32(obj.seq_ids, buffer, bufferOffset, null);
-    // Serialize message field [execution_times]
-    bufferOffset = _arraySerializer.float64(obj.execution_times, buffer, bufferOffset, null);
+    // Serialize message field [seq_id]
+    bufferOffset = _serializer.int32(obj.seq_id, buffer, bufferOffset);
+    // Serialize message field [execution_time]
+    bufferOffset = _serializer.duration(obj.execution_time, buffer, bufferOffset);
     // Serialize message field [trajectory]
     bufferOffset = moveit_msgs.msg.RobotTrajectory.serialize(obj.trajectory, buffer, bufferOffset);
     return bufferOffset;
@@ -60,10 +60,10 @@ class MovementPlan {
     //deserializes a message object of type MovementPlan
     let len;
     let data = new MovementPlan(null);
-    // Deserialize message field [seq_ids]
-    data.seq_ids = _arrayDeserializer.int32(buffer, bufferOffset, null)
-    // Deserialize message field [execution_times]
-    data.execution_times = _arrayDeserializer.float64(buffer, bufferOffset, null)
+    // Deserialize message field [seq_id]
+    data.seq_id = _deserializer.int32(buffer, bufferOffset);
+    // Deserialize message field [execution_time]
+    data.execution_time = _deserializer.duration(buffer, bufferOffset);
     // Deserialize message field [trajectory]
     data.trajectory = moveit_msgs.msg.RobotTrajectory.deserialize(buffer, bufferOffset);
     return data;
@@ -71,10 +71,8 @@ class MovementPlan {
 
   static getMessageSize(object) {
     let length = 0;
-    length += 4 * object.seq_ids.length;
-    length += 8 * object.execution_times.length;
     length += moveit_msgs.msg.RobotTrajectory.getMessageSize(object.trajectory);
-    return length + 8;
+    return length + 12;
   }
 
   static datatype() {
@@ -84,15 +82,15 @@ class MovementPlan {
 
   static md5sum() {
     //Returns md5sum for a message object
-    return 'bb27415c930ac47c69fa82e8b7dc0ccd';
+    return '6f421bb5afab38c9bd55dc301c0151a4';
   }
 
   static messageDefinition() {
     // Returns full string definition for message
     return `
     # MovementPlan.msg
-    int32[] seq_ids  # Sequence IDs to match each movement command
-    float64[] execution_times  # Corresponding execution times
+    int32 seq_id  # Sequence IDs to match each movement command
+    duration execution_time  # Corresponding execution times
     moveit_msgs/RobotTrajectory trajectory  # Using an external message type
     
     ================================================================================
@@ -203,18 +201,18 @@ class MovementPlan {
       msg = {};
     }
     const resolved = new MovementPlan(null);
-    if (msg.seq_ids !== undefined) {
-      resolved.seq_ids = msg.seq_ids;
+    if (msg.seq_id !== undefined) {
+      resolved.seq_id = msg.seq_id;
     }
     else {
-      resolved.seq_ids = []
+      resolved.seq_id = 0
     }
 
-    if (msg.execution_times !== undefined) {
-      resolved.execution_times = msg.execution_times;
+    if (msg.execution_time !== undefined) {
+      resolved.execution_time = msg.execution_time;
     }
     else {
-      resolved.execution_times = []
+      resolved.execution_time = {secs: 0, nsecs: 0}
     }
 
     if (msg.trajectory !== undefined) {

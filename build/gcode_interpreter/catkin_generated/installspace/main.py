@@ -38,9 +38,11 @@ class Communication:
         gcode_msg = fdm_msgs.msg.GCode()
         gcode_msg.lines = lines
         self.gcode_publisher.publish(gcode_msg)
+        rospy.sleep(0.01)
 
     def publish_movement_plan_request(self, cmd):
         self.movementPlanRequest_publisher.publish(cmd)
+        rospy.sleep(0.01)
 
 
 class GCodeInterpreter:
@@ -84,6 +86,11 @@ class ToolpathPlanner:
         print("No missing seq_id(s) detected.")
 
         movementCommands = self.filterMovement(self.gcodeCommandList)
+
+        for cmd in movementCommands:
+            self.comms.publish_movement_plan_request(cmd)
+            print(cmd)
+
         print(self.consecutiveMovementSequence(movementCommands))
 
     def filterMovement(self, gcodeCommandList):

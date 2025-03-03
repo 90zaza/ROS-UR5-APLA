@@ -25,24 +25,24 @@ struct MovementPlan_
   typedef MovementPlan_<ContainerAllocator> Type;
 
   MovementPlan_()
-    : seq_ids()
-    , execution_times()
+    : seq_id(0)
+    , execution_time()
     , trajectory()  {
     }
   MovementPlan_(const ContainerAllocator& _alloc)
-    : seq_ids(_alloc)
-    , execution_times(_alloc)
+    : seq_id(0)
+    , execution_time()
     , trajectory(_alloc)  {
   (void)_alloc;
     }
 
 
 
-   typedef std::vector<int32_t, typename std::allocator_traits<ContainerAllocator>::template rebind_alloc<int32_t>> _seq_ids_type;
-  _seq_ids_type seq_ids;
+   typedef int32_t _seq_id_type;
+  _seq_id_type seq_id;
 
-   typedef std::vector<double, typename std::allocator_traits<ContainerAllocator>::template rebind_alloc<double>> _execution_times_type;
-  _execution_times_type execution_times;
+   typedef ros::Duration _execution_time_type;
+  _execution_time_type execution_time;
 
    typedef  ::moveit_msgs::RobotTrajectory_<ContainerAllocator>  _trajectory_type;
   _trajectory_type trajectory;
@@ -76,8 +76,8 @@ return s;
 template<typename ContainerAllocator1, typename ContainerAllocator2>
 bool operator==(const ::fdm_msgs::MovementPlan_<ContainerAllocator1> & lhs, const ::fdm_msgs::MovementPlan_<ContainerAllocator2> & rhs)
 {
-  return lhs.seq_ids == rhs.seq_ids &&
-    lhs.execution_times == rhs.execution_times &&
+  return lhs.seq_id == rhs.seq_id &&
+    lhs.execution_time == rhs.execution_time &&
     lhs.trajectory == rhs.trajectory;
 }
 
@@ -135,12 +135,12 @@ struct MD5Sum< ::fdm_msgs::MovementPlan_<ContainerAllocator> >
 {
   static const char* value()
   {
-    return "bb27415c930ac47c69fa82e8b7dc0ccd";
+    return "6f421bb5afab38c9bd55dc301c0151a4";
   }
 
   static const char* value(const ::fdm_msgs::MovementPlan_<ContainerAllocator>&) { return value(); }
-  static const uint64_t static_value1 = 0xbb27415c930ac47cULL;
-  static const uint64_t static_value2 = 0x69fa82e8b7dc0ccdULL;
+  static const uint64_t static_value1 = 0x6f421bb5afab38c9ULL;
+  static const uint64_t static_value2 = 0xbd55dc301c0151a4ULL;
 };
 
 template<class ContainerAllocator>
@@ -160,8 +160,8 @@ struct Definition< ::fdm_msgs::MovementPlan_<ContainerAllocator> >
   static const char* value()
   {
     return "# MovementPlan.msg\n"
-"int32[] seq_ids  # Sequence IDs to match each movement command\n"
-"float64[] execution_times  # Corresponding execution times\n"
+"int32 seq_id  # Sequence IDs to match each movement command\n"
+"duration execution_time  # Corresponding execution times\n"
 "moveit_msgs/RobotTrajectory trajectory  # Using an external message type\n"
 "\n"
 "================================================================================\n"
@@ -280,8 +280,8 @@ namespace serialization
   {
     template<typename Stream, typename T> inline static void allInOne(Stream& stream, T m)
     {
-      stream.next(m.seq_ids);
-      stream.next(m.execution_times);
+      stream.next(m.seq_id);
+      stream.next(m.execution_time);
       stream.next(m.trajectory);
     }
 
@@ -301,18 +301,10 @@ struct Printer< ::fdm_msgs::MovementPlan_<ContainerAllocator> >
 {
   template<typename Stream> static void stream(Stream& s, const std::string& indent, const ::fdm_msgs::MovementPlan_<ContainerAllocator>& v)
   {
-    s << indent << "seq_ids[]" << std::endl;
-    for (size_t i = 0; i < v.seq_ids.size(); ++i)
-    {
-      s << indent << "  seq_ids[" << i << "]: ";
-      Printer<int32_t>::stream(s, indent + "  ", v.seq_ids[i]);
-    }
-    s << indent << "execution_times[]" << std::endl;
-    for (size_t i = 0; i < v.execution_times.size(); ++i)
-    {
-      s << indent << "  execution_times[" << i << "]: ";
-      Printer<double>::stream(s, indent + "  ", v.execution_times[i]);
-    }
+    s << indent << "seq_id: ";
+    Printer<int32_t>::stream(s, indent + "  ", v.seq_id);
+    s << indent << "execution_time: ";
+    Printer<ros::Duration>::stream(s, indent + "  ", v.execution_time);
     s << indent << "trajectory: ";
     s << std::endl;
     Printer< ::moveit_msgs::RobotTrajectory_<ContainerAllocator> >::stream(s, indent + "  ", v.trajectory);

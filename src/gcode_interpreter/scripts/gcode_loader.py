@@ -54,6 +54,7 @@ class GCodeInterpreter:
         for line in gcode_msg.lines:
             gcodeCommand_msg = fdm_msgs.msg.GCodeCommand()
             gcodeCommand_msg.cmd_id = self.cmd_id
+            gcodeCommand_msg.seq_id = self.seq_id
             parts = line.split(";", 1)
             comment = parts[1].strip() if len(parts) > 1 else ""
             command = parts[0].strip()
@@ -61,13 +62,11 @@ class GCodeInterpreter:
                 gcodeCommand_msg.is_final = True
                 gcodeCommand_msg.has_movement = True
                 gcodeCommand_msg.has_printing = True
-                gcodeCommand_msg.seq_id = self.seq_id
                 self.comms.publish_gcode_command(gcodeCommand_msg)
             if len(command) == 0:
                 self.cmd_id += 1
                 continue
             
-            gcodeCommand_msg.seq_id = self.seq_id
             parameters = command.split()
             printing_command = []
             hasF = False
