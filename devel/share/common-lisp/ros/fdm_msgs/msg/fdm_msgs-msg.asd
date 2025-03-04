@@ -11,4 +11,6 @@
     (:file "_package_GCodeCommand" :depends-on ("_package"))
     (:file "MovementPlan" :depends-on ("_package_MovementPlan"))
     (:file "_package_MovementPlan" :depends-on ("_package"))
+    (:file "MovementPlanConsec" :depends-on ("_package_MovementPlanConsec"))
+    (:file "_package_MovementPlanConsec" :depends-on ("_package"))
   ))

@@ -10,7 +10,6 @@ import sensor_msgs.msg
 import geometry_msgs.msg
 import moveit_commander as mc
 from math import pi
-from std_msgs.msg import String
 from tf.transformations import quaternion_from_euler
 
 class Communication:
@@ -91,7 +90,6 @@ class ToolpathPlanner:
                             0]
 
         self.trajectory_list = []
-        # self.last_time = rospy.Duration(0)
 
         self.goToHome()
 
@@ -131,7 +129,7 @@ class ToolpathPlanner:
                                        0.01,
                                        False)
         self.movementPlanMSG.trajectory = self.plan
-        self.movementPlanMSG.execution_times = float(self.plan.joint_trajectory.points[-1].time_from_start)
+        self.movementPlanMSG.execution_time = self.plan.joint_trajectory.points[-1].time_from_start
         self.comms.publish_toolpath_plan(self.movementPlanMSG)
         self.setStartState()
         return
@@ -141,13 +139,6 @@ class ToolpathPlanner:
         self.joint_state.position = copy.deepcopy(self.latest_joint_positions)
         self.robot_state.joint_state = copy.deepcopy(self.joint_state)
         self.move_group.set_start_state(copy.deepcopy(self.robot_state))
-        
-        # for point in self.plan.joint_trajectory.points:
-        #     if point.time_from_start.to_sec() == 0:
-        #         point.time_from_start += rospy.Duration(nsecs=1)
-        #     point.time_from_start += self.last_time
-        
-        # self.last_time = self.plan.joint_trajectory.points[-1].time_from_start
         self.trajectory_list.append(copy.deepcopy(self.plan))
         return
 
@@ -157,12 +148,8 @@ class ToolpathPlanner:
         for plan in self.trajectory_list:
             self.display_trajectory.trajectory.append(plan)
 
-        # print(len(self.display_trajectory))
-        # print(self.display_trajectory)
         self.comms.display_trajectory_publisher.publish(self.display_trajectory)
-
-        # input("Press Enter to execute the trajectory...")
-        # self.executePlan()
+        return
 
     def executePlan(self):
         if not self.trajectory_list:

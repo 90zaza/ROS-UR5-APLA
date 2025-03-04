@@ -12,6 +12,7 @@ class Communication:
 
         self.gcode_publisher = rospy.Publisher('/gcode_raw', fdm_msgs.msg.GCode, queue_size=10)
         self.movementPlanRequest_publisher = rospy.Publisher('/movement_plan_request', fdm_msgs.msg.GCodeCommand, queue_size=10)
+        self.movementPlanExecution_publisher = rospy.Publisher('/movement_execution', fdm_msgs.msg.MovementPlanConsec, queue_size=10)
 
     def set_class_pointers(self, gcodeInterpreter, toolpathPlanner):
         self.gcodeInterpreter = gcodeInterpreter
@@ -21,11 +22,12 @@ class Communication:
     
     def set_subscribers(self):
         rospy.Subscriber("gcode_command", fdm_msgs.msg.GCodeCommand, self.toolpathPlanner.gcodeCommands)
+        rospy.Subscriber("movement_plan_response", fdm_msgs.msg.MovementPlan, self.toolpathPlanner.movementPlanConcatenater)
 
         return
 
     def wait_for_publishers(self):        
-        while (self.gcode_publisher.get_num_connections()) == 0: # and self.movementPlanRequest_publisher.get_num_connections()) == 0:
+        while (self.gcode_publisher.get_num_connections() and self.movementPlanRequest_publisher.get_num_connections()) == 0:
             rospy.logwarn("Waiting for subscribers to connect on 'gcode_raw' and 'movement_plan_request'...")
             rospy.sleep(1)
 
@@ -40,9 +42,18 @@ class Communication:
         self.gcode_publisher.publish(gcode_msg)
         rospy.sleep(0.01)
 
+        return
+
     def publish_movement_plan_request(self, cmd):
         self.movementPlanRequest_publisher.publish(cmd)
         rospy.sleep(0.01)
+
+        return
+
+    def publish_movement_execution(self, cmd):
+        self.movementPlanExecution_publisher.publish(cmd)
+
+        return
 
 
 class GCodeInterpreter:
@@ -66,6 +77,7 @@ class ToolpathPlanner:
     def __init__(self, comms):
         self.comms = comms
         self.gcodeCommandList = []
+        self.countedMovementCommands = 0
 
     def gcodeCommands(self, gcodeCommand):
         self.gcodeCommandList.append(gcodeCommand)
@@ -86,16 +98,22 @@ class ToolpathPlanner:
         print("No missing seq_id(s) detected.")
 
         movementCommands = self.filterMovement(self.gcodeCommandList)
+        self.totalMovementCommands = len(movementCommands) - 1
+        self.sequentialMovementCommands = self.consecutiveMovementSequence(movementCommands[:-1])
+        self.sequentialMovementCommandsIndices = dict( (j,(x, y)) for x, i in enumerate(self.sequentialMovementCommands) for y, j in enumerate(i) )
+        self.movementPlanList = [[None] * len(sublist) for sublist in self.sequentialMovementCommands]
+        self.movementPlanConsecList = [None] * len(self.sequentialMovementCommands)
+
+        print(f'{self.sequentialMovementCommands}\n')
 
         for cmd in movementCommands:
             self.comms.publish_movement_plan_request(cmd)
-            print(cmd)
 
-        print(self.consecutiveMovementSequence(movementCommands))
+        return
 
     def filterMovement(self, gcodeCommandList):
         return [cmd for cmd in gcodeCommandList if cmd.has_movement]
-    
+
     def consecutiveMovementSequence(self, movementCommands):
         grouped_seq_ids = []
         current_group = []
@@ -115,7 +133,36 @@ class ToolpathPlanner:
             grouped_seq_ids.append(current_group)
 
         return grouped_seq_ids
-                
+    
+    def movementPlanConcatenater(self, movementPlan):
+        self.countedMovementCommands += 1
+        index = self.sequentialMovementCommandsIndices[movementPlan.seq_id]
+        self.movementPlanList[index[0]][index[1]] = movementPlan
+        last_time = None
+
+        if not None in self.movementPlanList[index[0]]:
+            self.movementPlanConsecList[index[0]] = fdm_msgs.msg.MovementPlanConsec()
+            last_time = self.movementPlanList[index[0]][0].trajectory.joint_trajectory.points[-1].time_from_start
+            self.movementPlanConsecList[index[0]].timestamps.append(last_time)
+            self.movementPlanConsecList[index[0]].trajectory.append(self.movementPlanList[index[0]][0].trajectory)
+            for mvmPlan in self.movementPlanList[index[0]][1:]:
+                for point in mvmPlan.trajectory.joint_trajectory.points:
+                    if point.time_from_start.to_sec() == 0:
+                        point.time_from_start += rospy.Duration(nsecs=1)
+                    point.time_from_start += last_time
+                last_time = mvmPlan.trajectory.joint_trajectory.points[-1].time_from_start
+                self.movementPlanConsecList[index[0]].timestamps.append(last_time)
+                self.movementPlanConsecList[index[0]].trajectory.append(mvmPlan.trajectory)
+            self.movementPlanConsecList[index[0]].seq_ids = self.sequentialMovementCommands[index[0]]
+
+        if self.totalMovementCommands == self.countedMovementCommands:
+            self.executer()
+        return
+    
+    def executer(self):
+        for mvmCommand in self.movementPlanConsecList:
+            self.comms.publish_movement_execution(mvmCommand)
+            rospy.sleep(mvmCommand.timestamps[-1])
 
 def main():
     rospy.init_node('main', anonymous=True)

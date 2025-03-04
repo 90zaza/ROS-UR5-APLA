@@ -1,6 +1,6 @@
 # generated from genmsg/cmake/pkg-genmsg.context.in
 
-messages_str = "/home/tim/FDMPrinting/src/fdm_msgs/msg/GCode.msg;/home/tim/FDMPrinting/src/fdm_msgs/msg/GCodeCommand.msg;/home/tim/FDMPrinting/src/fdm_msgs/msg/MovementPlan.msg"
+messages_str = "/home/tim/FDMPrinting/src/fdm_msgs/msg/GCode.msg;/home/tim/FDMPrinting/src/fdm_msgs/msg/GCodeCommand.msg;/home/tim/FDMPrinting/src/fdm_msgs/msg/MovementPlan.msg;/home/tim/FDMPrinting/src/fdm_msgs/msg/MovementPlanConsec.msg"
 services_str = ""
 pkg_name = "fdm_msgs"
 dependencies_str = "std_msgs;moveit_msgs"

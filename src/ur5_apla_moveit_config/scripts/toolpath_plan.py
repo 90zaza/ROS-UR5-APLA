@@ -10,7 +10,6 @@ import sensor_msgs.msg
 import geometry_msgs.msg
 import moveit_commander as mc
 from math import pi
-from std_msgs.msg import String
 from tf.transformations import quaternion_from_euler
 
 class Communication:
@@ -29,6 +28,7 @@ class Communication:
     
     def set_subscribers(self):
         rospy.Subscriber("movement_plan_request", fdm_msgs.msg.GCodeCommand, self.toolpathPlanner.robotPosition)
+        rospy.Subscriber("movement_execution", fdm_msgs.msg.MovementPlanConsec, self.toolpathPlanner.executePlan)
 
         return
     
@@ -91,7 +91,6 @@ class ToolpathPlanner:
                             0]
 
         self.trajectory_list = []
-        # self.last_time = rospy.Duration(0)
 
         self.goToHome()
 
@@ -150,20 +149,16 @@ class ToolpathPlanner:
         for plan in self.trajectory_list:
             self.display_trajectory.trajectory.append(plan)
 
-        # print(len(self.display_trajectory))
-        # print(self.display_trajectory)
         self.comms.display_trajectory_publisher.publish(self.display_trajectory)
+        return
 
-        # input("Press Enter to execute the trajectory...")
-        # self.executePlan()
-
-    def executePlan(self):
-        if not self.trajectory_list:
+    def executePlan(self, mvmPlan):
+        if not mvmPlan.trajectory:
             print("No trajectory to execute!")
             return
         
         full_trajectory = moveit_msgs.msg.RobotTrajectory()
-        for plan in self.trajectory_list:
+        for plan in mvmPlan.trajectory:
             full_trajectory.joint_trajectory.points.extend(plan.joint_trajectory.points)
             if not full_trajectory.joint_trajectory.joint_names:
                 full_trajectory.joint_trajectory.joint_names = plan.joint_trajectory.joint_names

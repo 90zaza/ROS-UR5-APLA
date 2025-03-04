@@ -53,6 +53,7 @@ catkin_python_setup()
    GCode.msg
    GCodeCommand.msg
    MovementPlan.msg
+   MovementPlanConsec.msg
  )
 
 ## Generate services in the 'srv' folder
