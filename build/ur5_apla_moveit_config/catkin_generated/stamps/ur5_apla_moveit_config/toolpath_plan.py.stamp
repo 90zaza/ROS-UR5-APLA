@@ -28,6 +28,7 @@ class Communication:
     
     def set_subscribers(self):
         rospy.Subscriber("movement_plan_request", fdm_msgs.msg.GCodeCommand, self.toolpathPlanner.robotPosition)
+        rospy.Subscriber("movement_execution", fdm_msgs.msg.MovementPlanConsec, self.toolpathPlanner.executePlan)
 
         return
     
@@ -88,11 +89,9 @@ class ToolpathPlanner:
                             4.7124,
                             4.7124,
                             0]
-
         self.trajectory_list = []
 
         self.goToHome()
-
         self.movementPlanMSG = fdm_msgs.msg.MovementPlan()
 
         self.display_trajectory = moveit_msgs.msg.DisplayTrajectory()
@@ -151,18 +150,12 @@ class ToolpathPlanner:
         self.comms.display_trajectory_publisher.publish(self.display_trajectory)
         return
 
-    def executePlan(self):
-        if not self.trajectory_list:
+    def executePlan(self, mvmPlan):
+        if not mvmPlan.trajectory:
             print("No trajectory to execute!")
             return
         
-        full_trajectory = moveit_msgs.msg.RobotTrajectory()
-        for plan in self.trajectory_list:
-            full_trajectory.joint_trajectory.points.extend(plan.joint_trajectory.points)
-            if not full_trajectory.joint_trajectory.joint_names:
-                full_trajectory.joint_trajectory.joint_names = plan.joint_trajectory.joint_names
-        
-        self.move_group.execute(full_trajectory, wait=True)
+        self.move_group.execute(mvmPlan.trajectory, wait=True)
         print("Trajectory execution completed!")
 
 

@@ -23,7 +23,7 @@
    (&key
     ((:seq_ids __seq_ids) (make-array 0 :initial-element 0 :element-type :integer))
     ((:timestamps __timestamps) (let (r) (dotimes (i 0) (push (instance ros::time :init) r)) r))
-    ((:trajectory __trajectory) ())
+    ((:trajectory __trajectory) (instance moveit_msgs::RobotTrajectory :init))
     )
    (send-super :init)
    (setq _seq_ids __seq_ids)
@@ -50,8 +50,8 @@
     (* 4    (length _seq_ids)) 4
     ;; duration[] _timestamps
     (* 8    (length _timestamps)) 4
-    ;; moveit_msgs/RobotTrajectory[] _trajectory
-    (apply #'+ (send-all _trajectory :serialization-length)) 4
+    ;; moveit_msgs/RobotTrajectory _trajectory
+    (send _trajectory :serialization-length)
     ))
   (:serialize
    (&optional strm)
@@ -67,11 +67,8 @@
      (dotimes (i (length _timestamps))
        (write-long (send (elt _timestamps i) :sec) s) (write-long (send (elt _timestamps i) :nsec) s)
        )
-     ;; moveit_msgs/RobotTrajectory[] _trajectory
-     (write-long (length _trajectory) s)
-     (dolist (elem _trajectory)
-       (send elem :serialize s)
-       )
+     ;; moveit_msgs/RobotTrajectory _trajectory
+       (send _trajectory :serialize s)
      ;;
      (if (null strm) (get-output-stream-string s))))
   (:deserialize
@@ -90,13 +87,8 @@
      (dolist (elem- _timestamps)
      (send elem- :sec (sys::peek buf ptr- :integer)) (incf ptr- 4)  (send elem- :nsec (sys::peek buf ptr- :integer)) (incf ptr- 4)
      ))
-   ;; moveit_msgs/RobotTrajectory[] _trajectory
-   (let (n)
-     (setq n (sys::peek buf ptr- :integer)) (incf ptr- 4)
-     (setq _trajectory (let (r) (dotimes (i n) (push (instance moveit_msgs::RobotTrajectory :init) r)) r))
-     (dolist (elem- _trajectory)
-     (send elem- :deserialize buf ptr-) (incf ptr- (send elem- :serialization-length))
-     ))
+   ;; moveit_msgs/RobotTrajectory _trajectory
+     (send _trajectory :deserialize buf ptr-) (incf ptr- (send _trajectory :serialization-length))
    ;;
    self)
   )
@@ -106,8 +98,8 @@
 (setf (get fdm_msgs::MovementPlanConsec :definition-)
       "# MovementPlanConsec.msg
 int32[] seq_ids  # Sequence IDs to match each movement command
-duration[] timestamps  # Corresponding execution times
-moveit_msgs/RobotTrajectory[] trajectory  # Using an external message type
+duration[] timestamps  # Corresponding timestamps
+moveit_msgs/RobotTrajectory trajectory  # Corresponding trajectory command
 
 ================================================================================
 MSG: moveit_msgs/RobotTrajectory

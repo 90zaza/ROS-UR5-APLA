@@ -57,6 +57,6 @@ if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_
 endif()
 
 if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/duet3_control" TYPE PROGRAM FILES "/home/tim/FDMPrinting/build/duet3_control/catkin_generated/installspace/http_client.py")
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/duet3_control" TYPE PROGRAM FILES "/home/tim/FDMPrinting/build/duet3_control/catkin_generated/installspace/duet_communicater.py")
 endif()
 

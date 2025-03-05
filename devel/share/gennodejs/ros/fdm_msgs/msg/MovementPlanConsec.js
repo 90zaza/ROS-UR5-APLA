@@ -40,7 +40,7 @@ class MovementPlanConsec {
         this.trajectory = initObj.trajectory
       }
       else {
-        this.trajectory = [];
+        this.trajectory = new moveit_msgs.msg.RobotTrajectory();
       }
     }
   }
@@ -52,11 +52,7 @@ class MovementPlanConsec {
     // Serialize message field [timestamps]
     bufferOffset = _arraySerializer.duration(obj.timestamps, buffer, bufferOffset, null);
     // Serialize message field [trajectory]
-    // Serialize the length for message field [trajectory]
-    bufferOffset = _serializer.uint32(obj.trajectory.length, buffer, bufferOffset);
-    obj.trajectory.forEach((val) => {
-      bufferOffset = moveit_msgs.msg.RobotTrajectory.serialize(val, buffer, bufferOffset);
-    });
+    bufferOffset = moveit_msgs.msg.RobotTrajectory.serialize(obj.trajectory, buffer, bufferOffset);
     return bufferOffset;
   }
 
@@ -69,12 +65,7 @@ class MovementPlanConsec {
     // Deserialize message field [timestamps]
     data.timestamps = _arrayDeserializer.duration(buffer, bufferOffset, null)
     // Deserialize message field [trajectory]
-    // Deserialize array length for message field [trajectory]
-    len = _deserializer.uint32(buffer, bufferOffset);
-    data.trajectory = new Array(len);
-    for (let i = 0; i < len; ++i) {
-      data.trajectory[i] = moveit_msgs.msg.RobotTrajectory.deserialize(buffer, bufferOffset)
-    }
+    data.trajectory = moveit_msgs.msg.RobotTrajectory.deserialize(buffer, bufferOffset);
     return data;
   }
 
@@ -82,10 +73,8 @@ class MovementPlanConsec {
     let length = 0;
     length += 4 * object.seq_ids.length;
     length += 8 * object.timestamps.length;
-    object.trajectory.forEach((val) => {
-      length += moveit_msgs.msg.RobotTrajectory.getMessageSize(val);
-    });
-    return length + 12;
+    length += moveit_msgs.msg.RobotTrajectory.getMessageSize(object.trajectory);
+    return length + 8;
   }
 
   static datatype() {
@@ -103,8 +92,8 @@ class MovementPlanConsec {
     return `
     # MovementPlanConsec.msg
     int32[] seq_ids  # Sequence IDs to match each movement command
-    duration[] timestamps  # Corresponding execution times
-    moveit_msgs/RobotTrajectory[] trajectory  # Using an external message type
+    duration[] timestamps  # Corresponding timestamps
+    moveit_msgs/RobotTrajectory trajectory  # Corresponding trajectory command
     
     ================================================================================
     MSG: moveit_msgs/RobotTrajectory
@@ -229,13 +218,10 @@ class MovementPlanConsec {
     }
 
     if (msg.trajectory !== undefined) {
-      resolved.trajectory = new Array(msg.trajectory.length);
-      for (let i = 0; i < resolved.trajectory.length; ++i) {
-        resolved.trajectory[i] = moveit_msgs.msg.RobotTrajectory.Resolve(msg.trajectory[i]);
-      }
+      resolved.trajectory = moveit_msgs.msg.RobotTrajectory.Resolve(msg.trajectory)
     }
     else {
-      resolved.trajectory = []
+      resolved.trajectory = new moveit_msgs.msg.RobotTrajectory()
     }
 
     return resolved;

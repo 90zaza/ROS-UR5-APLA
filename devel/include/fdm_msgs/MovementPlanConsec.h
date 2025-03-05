@@ -44,7 +44,7 @@ struct MovementPlanConsec_
    typedef std::vector<ros::Duration, typename std::allocator_traits<ContainerAllocator>::template rebind_alloc<ros::Duration>> _timestamps_type;
   _timestamps_type timestamps;
 
-   typedef std::vector< ::moveit_msgs::RobotTrajectory_<ContainerAllocator> , typename std::allocator_traits<ContainerAllocator>::template rebind_alloc< ::moveit_msgs::RobotTrajectory_<ContainerAllocator> >> _trajectory_type;
+   typedef  ::moveit_msgs::RobotTrajectory_<ContainerAllocator>  _trajectory_type;
   _trajectory_type trajectory;
 
 
@@ -161,8 +161,8 @@ struct Definition< ::fdm_msgs::MovementPlanConsec_<ContainerAllocator> >
   {
     return "# MovementPlanConsec.msg\n"
 "int32[] seq_ids  # Sequence IDs to match each movement command\n"
-"duration[] timestamps  # Corresponding execution times\n"
-"moveit_msgs/RobotTrajectory[] trajectory  # Using an external message type\n"
+"duration[] timestamps  # Corresponding timestamps\n"
+"moveit_msgs/RobotTrajectory trajectory  # Corresponding trajectory command\n"
 "\n"
 "================================================================================\n"
 "MSG: moveit_msgs/RobotTrajectory\n"
@@ -313,14 +313,9 @@ struct Printer< ::fdm_msgs::MovementPlanConsec_<ContainerAllocator> >
       s << indent << "  timestamps[" << i << "]: ";
       Printer<ros::Duration>::stream(s, indent + "  ", v.timestamps[i]);
     }
-    s << indent << "trajectory[]" << std::endl;
-    for (size_t i = 0; i < v.trajectory.size(); ++i)
-    {
-      s << indent << "  trajectory[" << i << "]: ";
-      s << std::endl;
-      s << indent;
-      Printer< ::moveit_msgs::RobotTrajectory_<ContainerAllocator> >::stream(s, indent + "    ", v.trajectory[i]);
-    }
+    s << indent << "trajectory: ";
+    s << std::endl;
+    Printer< ::moveit_msgs::RobotTrajectory_<ContainerAllocator> >::stream(s, indent + "  ", v.trajectory);
   }
 };
 
