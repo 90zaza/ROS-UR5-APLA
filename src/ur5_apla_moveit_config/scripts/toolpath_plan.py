@@ -100,6 +100,7 @@ class ToolpathPlanner:
         return
     
     def goToHome(self):
+        self.joint_state.position = [1.5708, -1.5708, 1.5708, 4.7124, 4.7124, 0]
         self.move_group.go(copy.deepcopy(self.joint_state))
         self.move_group.stop()
         return
@@ -153,6 +154,9 @@ class ToolpathPlanner:
     def executePlan(self, mvmPlan):
         if not mvmPlan.trajectory:
             print("No trajectory to execute!")
+            return
+        if mvmPlan.seq_ids[0] == -1:
+            self.goToHome()
             return
         
         self.move_group.execute(mvmPlan.trajectory, wait=True)

@@ -188,13 +188,16 @@ class Executer:
         cmdCounter = 0
         mvmCounter = 0
         while cmdCounter < len(gcodeCommandList):
+            if gcodeCommandList[cmdCounter].is_final:
+                print(f"I should be at the end, sending UR5 to Home")
+                finalCMD = fdm_msgs.msg.MovementPlanConsec()
+                finalCMD.seq_ids = [-1]
+                self.comms.publish_movement_execution(finalCMD)
+                return
             if gcodeCommandList[cmdCounter].has_movement:
                 print(f'Executing movementPlanList[{mvmCounter}]')
-                try:
-                    self.comms.publish_movement_execution(movementPlanList[mvmCounter])
-                except IndexError:
-                    print(f"I should be at the end, received {e}")
-                    return
+                self.comms.publish_movement_execution(movementPlanList[mvmCounter])
+                    
                 for i in range(len(movementPlanList[mvmCounter].timestamps)):
                     print(f'Sending gcodeCommand {gcodeCommandList[cmdCounter].printing_command}')
                     self.comms.publish_duet_request(gcodeCommandList[cmdCounter])
