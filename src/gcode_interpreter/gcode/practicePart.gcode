@@ -25,7 +25,7 @@ G28 X0 Y0 ;move X/Y to min endstops
 G28 Z0 ;move Z to min endstops
 G1 Z15.0 F9000 ;move the platform down 15mm
 G92 E0 ;zero the extruded length
-G1 F200 E3 ;extrude 3mm of feed stock
+G1 F200 E30 ;extrude 3mm of feed stock
 G92 E0 ;zero the extruded length again
 G1 F9000
 ;Put printing message on LCD screen
@@ -37,7 +37,7 @@ G1 F1500 E-6.5
 ;LAYER:0
 M107
 ;MESH:PracticePart.STL
-G0 F3600 X109.4 Y109.4 Z0.5
+G0 F3600 X109.4 Y109.4 Z0.24
 ;TYPE:WALL-INNER
 G1 F1500 E0
 G1 F1800 X109.4 Y90.6 E0.93794

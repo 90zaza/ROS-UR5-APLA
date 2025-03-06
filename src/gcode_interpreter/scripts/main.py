@@ -174,6 +174,7 @@ class ToolpathPlanner:
             self.movementPlanConsecList[index[0]].seq_ids = self.sequentialMovementCommands[index[0]]
 
         if self.totalMovementCommands == self.countedMovementCommands:
+            input("Everything seems to be ready for execution, press Enter to continue.")
             self.executer.mainLoop(self.gcodeCommandList, self.movementPlanConsecList)
         return
 
@@ -189,7 +190,11 @@ class Executer:
         while cmdCounter < len(gcodeCommandList):
             if gcodeCommandList[cmdCounter].has_movement:
                 print(f'Executing movementPlanList[{mvmCounter}]')
-                # self.comms.publish_movement_execution(movementPlanList[mvmCounter])
+                try:
+                    self.comms.publish_movement_execution(movementPlanList[mvmCounter])
+                except IndexError:
+                    print(f"I should be at the end, received {e}")
+                    return
                 for i in range(len(movementPlanList[mvmCounter].timestamps)):
                     print(f'Sending gcodeCommand {gcodeCommandList[cmdCounter].printing_command}')
                     self.comms.publish_duet_request(gcodeCommandList[cmdCounter])
@@ -206,7 +211,7 @@ class Executer:
             cmdCounter += 1
         return
     
-    def waitForDuetResponse(self, timeout=5):
+    def waitForDuetResponse(self, timeout=120):
         rospy.loginfo("Waiting for /duet_response message...")
         received = self.response_event.wait(timeout)  # Blocks until event is set or timeout occurs
 
