@@ -58,7 +58,7 @@ class ToolpathPlanner:
 
         self.move_group.set_pose_reference_frame('buildPlate')
         self.move_group.limit_max_cartesian_link_speed(0.3, link_name='tcp')
-        self.move_group.set_max_acceleration_scaling_factor(0.1)
+        self.move_group.set_max_acceleration_scaling_factor(0.05)
 
         # initialize "Home" position robotic arm, in frame 'buildPlate'
         self.pose_goal = geometry_msgs.msg.Pose()

@@ -68,7 +68,7 @@ class GCodeInterpreter:
                 continue
             
             parameters = command.split()
-            printing_command = []
+            printing_command = command
             hasF = False
 
             for param in parameters:
@@ -84,8 +84,8 @@ class GCodeInterpreter:
                 elif param[0] == "F":
                     self.f_value = float(param[1:])
                     hasF = True
-                else:
-                    printing_command.append(param)
+                # else:
+                #     printing_command.append(param)
 
             gcodeCommand_msg.x = self.x_value
             gcodeCommand_msg.y = self.y_value
@@ -93,11 +93,12 @@ class GCodeInterpreter:
             gcodeCommand_msg.f = self.f_value
 
             if len(printing_command) > 0:
-                gcodeCommand_msg.printing_command = " ".join(printing_command)
-                if hasF:
-                    gcodeCommand_msg.printing_command += " F" + str(gcodeCommand_msg.f)
+                # gcodeCommand_msg.printing_command = " ".join(printing_command)
+                # if hasF:
+                #     gcodeCommand_msg.printing_command += " F" + str(gcodeCommand_msg.f)
                 
                 gcodeCommand_msg.has_printing = True
+                gcodeCommand_msg.printing_command = printing_command
             
             self.seq_id += 1
             self.cmd_id += 1

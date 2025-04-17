@@ -51,8 +51,8 @@ if __name__ == '__main__':
     offset = doc['calibration']['z']
 
     # Set movement speed (0.3 = 30% of max speed, 1.0 = 100% max speed)
-    move_group.set_max_velocity_scaling_factor(0.3)  # Adjust for desired speed
-    move_group.set_max_acceleration_scaling_factor(1.0)  # Fastest acceleration
+    move_group.set_max_velocity_scaling_factor(0.2)  # Adjust for desired speed
+    move_group.set_max_acceleration_scaling_factor(0.1)  # Fastest acceleration
 
     waypoints = []
     move_group.set_pose_reference_frame('buildPlate')
@@ -75,7 +75,7 @@ if __name__ == '__main__':
     pose_goal = geometry_msgs.msg.Pose()
     pose_goal.position.x = 0.15
     pose_goal.position.y = 0.15
-    pose_goal.position.z = 0
+    pose_goal.position.z = 0.1
 
     #For world frame
     # quaternion = quaternion_from_euler(pi, 0, 0)
