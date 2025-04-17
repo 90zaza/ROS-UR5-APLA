@@ -445,6 +445,15 @@ dynamic_reconfigure_DIR:PATH=/opt/ros/noetic/share/dynamic_reconfigure/cmake
 eigen_stl_containers_DIR:PATH=/opt/ros/noetic/share/eigen_stl_containers/cmake
 
 //Value Computed by CMake
+fdm_msgs_BINARY_DIR:STATIC=/home/tim/FDMPrinting/build/fdm_msgs
+
+//The directory containing a CMake configuration file for fdm_msgs.
+fdm_msgs_DIR:PATH=/home/tim/FDMPrinting/devel/share/fdm_msgs/cmake
+
+//Value Computed by CMake
+fdm_msgs_SOURCE_DIR:STATIC=/home/tim/FDMPrinting/src/fdm_msgs
+
+//Value Computed by CMake
 gcode_interpreter_BINARY_DIR:STATIC=/home/tim/FDMPrinting/build/gcode_interpreter
 
 //Value Computed by CMake
@@ -964,7 +973,7 @@ CMAKE_MODULE_LINKER_FLAGS_RELWITHDEBINFO-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_NM
 CMAKE_NM-ADVANCED:INTERNAL=1
 //number of local generators
-CMAKE_NUMBER_OF_MAKEFILES:INTERNAL=8
+CMAKE_NUMBER_OF_MAKEFILES:INTERNAL=9
 //ADVANCED property for variable: CMAKE_OBJCOPY
 CMAKE_OBJCOPY-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_OBJDUMP

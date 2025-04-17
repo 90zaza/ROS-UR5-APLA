@@ -60,3 +60,7 @@ if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_
   file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/gcode_interpreter" TYPE PROGRAM FILES "/home/tim/FDMPrinting/build/gcode_interpreter/catkin_generated/installspace/gcode_loader.py")
 endif()
 
+if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/gcode_interpreter" TYPE PROGRAM FILES "/home/tim/FDMPrinting/build/gcode_interpreter/catkin_generated/installspace/main.py")
+endif()
+

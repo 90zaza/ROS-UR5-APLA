@@ -1,129 +1,120 @@
+#!/usr/bin/env python
+
 import rospy
+import fdm_msgs.msg
 from std_msgs.msg import String
+import math
 import sys
 import json
 
-class topicPublisher:
+class Communication:
     def __init__(self):
-        rospy.init_node('gcode_publisher', anonymous=True)
-        
-        self.movement_pub = rospy.Publisher('gcode_movement', String, queue_size=10)
-        self.printing_pub = rospy.Publisher('gcode_printing', String, queue_size=10)
+        self.gcodeInterpreter = None
 
-        # Wait for the client node (or any subscriber) to connect on gcode_movement
-        while (self.movement_pub.get_num_connections() or self.printing_pub.get_num_connections()) == 0:
-            rospy.logwarn("Waiting for subscribers to connect on 'gcode_movement' or 'gcode_printing'...")
+        self.gcode_command_pub = rospy.Publisher('/gcode_command', fdm_msgs.msg.GCodeCommand, queue_size=10)
+    
+    def set_class_pointers(self, gcodeInterpreter):
+        self.gcodeInterpreter = gcodeInterpreter
+
+        return
+
+    def set_subscribers(self):
+        rospy.Subscriber("gcode_raw", fdm_msgs.msg.GCode, self.gcodeInterpreter.line_interpreter)
+
+        return
+
+    def wait_for_publishers(self):
+        while self.gcode_command_pub.get_num_connections() == 0:
+            rospy.logwarn("Waiting for subscribers to connect on 'gcode_command'...")
             rospy.sleep(1)
 
-        return
-
-
-    def publish_gcode_lines(self, movementCommand, printingCommand):
-        rospy.loginfo(f"Publishing: {movementCommand} on 'gcode_movement'")
-        # rospy.loginfo(f"Publishing: {printingCommand} on 'gcode_printing'")
-
-        self.movement_pub.publish(movementCommand)
-        self.printing_pub.publish(printingCommand)
-
-        # rospy.sleep(0.5)
+        rospy.sleep(2)
+        rospy.loginfo("Communication initialized for gcode_loader.py. Publishing to /gcode_command")
 
         return
 
-class gcodeInterpreter:
-    def __init__(self):
-        self.x_value = None
-        self.y_value = None
-        self.z_value = None
-        self.f_value = None
 
-    def line_interpreter(self, line, command_number, line_number):
-        # Split the comment and command parts
-        parts = line.split(";", 1)
-        comment = parts[1].strip() if len(parts) > 1 else ""
-        
-        # Extract parameters
-        command_part = parts[0].strip()
-        parameters = command_part.split()
-
-        for param in parameters:
-            if param.startswith("F"):
-                self.f_value = float(param[1:])
-        
-        xyz_found = False
-        remaining_params = []
-        for param in parameters:
-            if param.startswith("X"):
-                self.x_value = float(param[1:])
-                xyz_found = True
-            elif param.startswith("Y"):
-                self.y_value = float(param[1:])
-                xyz_found = True
-            elif param.startswith("Z"):
-                self.z_value = float(param[1:])
-                xyz_found = True
-            else:
-                remaining_params.append(param)
-        
-        printing_string = " ".join(remaining_params)
-        
-        if xyz_found or comment == "End of Gcode":
-            movementCommand = {
-                "command": command_number,
-                "line": line_number,
-                "movement": {
-                    "x": self.x_value,
-                    "y": self.y_value,
-                    "z": self.z_value,
-                    "f": self.f_value
-                },
-                "comment": comment
-            }
-        else:
-            movementCommand = None
-
-        if printing_string.strip(): 
-            printingCommand = {
-                "command": command_number,
-                "line": line_number,
-                "printing": printing_string,
-                "comment": comment
-            }
-        else:
-            printingCommand = None
-        
-        return json.dumps(movementCommand), json.dumps(printingCommand)
-
-
-    def gcode_parser(self, file_path):
-        try:
-            command_number = 0
-            with open(file_path, 'r') as file:
-                for line_number, line in enumerate(file, start=1):
-                    command = line.strip()
-                    if not command:
-                        continue
-                    
-                    command_number += 1
-                    print('here')
-                    movementCommand, printingCommand = self.line_interpreter(command, command_number, line_number)
-                    publisher.publish_gcode_lines(movementCommand, printingCommand)
-                    
-            rospy.loginfo("Finished processing G-code file.")
-        except Exception as e:
-            rospy.logerr(f"Error reading file: {e}")
+    def publish_gcode_command(self, command):
+        self.gcode_command_pub.publish(command)
+        rospy.sleep(0.01)
 
         return
+
+class GCodeInterpreter:
+    def __init__(self, communication):
+        self.comms = communication
+        self.seq_id = 0
+        self.cmd_id = 1
+        self.x_value = math.nan
+        self.y_value = math.nan
+        self.z_value = math.nan
+        self.f_value = math.nan
+
+    def line_interpreter(self, gcode_msg):
+        for line in gcode_msg.lines:
+            gcodeCommand_msg = fdm_msgs.msg.GCodeCommand()
+            gcodeCommand_msg.cmd_id = self.cmd_id
+            gcodeCommand_msg.seq_id = self.seq_id
+            parts = line.split(";", 1)
+            comment = parts[1].strip() if len(parts) > 1 else ""
+            command = parts[0].strip()
+            if comment == "End of Gcode":
+                gcodeCommand_msg.is_final = True
+                gcodeCommand_msg.has_movement = True
+                gcodeCommand_msg.has_printing = True
+                self.comms.publish_gcode_command(gcodeCommand_msg)
+            if len(command) == 0:
+                self.cmd_id += 1
+                continue
+            
+            parameters = command.split()
+            printing_command = command
+            hasF = False
+
+            for param in parameters:
+                if param[0] == "X":
+                    self.x_value = float(param[1:])
+                    gcodeCommand_msg.has_movement = True
+                elif param[0] == "Y":
+                    self.y_value = float(param[1:])
+                    gcodeCommand_msg.has_movement = True
+                elif param[0] == "Z":
+                    self.z_value = float(param[1:])
+                    gcodeCommand_msg.has_movement = True
+                elif param[0] == "F":
+                    self.f_value = float(param[1:])
+                    hasF = True
+                # else:
+                #     printing_command.append(param)
+
+            gcodeCommand_msg.x = self.x_value
+            gcodeCommand_msg.y = self.y_value
+            gcodeCommand_msg.z = self.z_value
+            gcodeCommand_msg.f = self.f_value
+
+            if len(printing_command) > 0:
+                # gcodeCommand_msg.printing_command = " ".join(printing_command)
+                # if hasF:
+                #     gcodeCommand_msg.printing_command += " F" + str(gcodeCommand_msg.f)
+                
+                gcodeCommand_msg.has_printing = True
+                gcodeCommand_msg.printing_command = printing_command
+            
+            self.seq_id += 1
+            self.cmd_id += 1
+            self.comms.publish_gcode_command(gcodeCommand_msg)
+        
+def main():
+    rospy.init_node('gcode_interpreter', anonymous=True)
+
+    comms = Communication()
+    gcodeInterpreter = GCodeInterpreter(comms)
+
+    comms.set_class_pointers(gcodeInterpreter)
+    comms.set_subscribers()
+    comms.wait_for_publishers()
+    
+    rospy.spin()
 
 if __name__ == '__main__':
-    publisher = topicPublisher()
-    interpreter = gcodeInterpreter()
-
-    try:
-        if len(sys.argv) < 2:
-            rospy.logerr("Usage: rosrun gcode_interpreter gcode_loader <file.gcode>")
-            sys.exit(1)
-        
-        gcode_file_path = sys.argv[1]
-        interpreter.gcode_parser(gcode_file_path)
-    except rospy.ROSInterruptException:
-        pass
+    main()

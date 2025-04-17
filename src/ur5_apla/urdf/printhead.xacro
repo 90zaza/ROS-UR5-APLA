@@ -13,22 +13,23 @@
     <link name="${prefix}printhead">
       <visual>
         <geometry>
-          <!-- The path to the visual meshes in the package. -->
-          <mesh filename="package://ur5_apla/meshes/printhead/visual/printhead.dae"/>
+          <!-- The path to the visual meshes in the package. This can be the dae variant -->
+          <mesh filename="package://ur5_apla/meshes/printhead/visual/printheadv2.stl"/>
         </geometry>
       </visual>
       <collision>
         <geometry>
           <!-- The path to the collision meshes in the package. -->
-          <mesh filename="package://ur5_apla/meshes/printhead/collision/printhead.stl"/>
+          <mesh filename="package://ur5_apla/meshes/printhead/collision/printheadv2.stl"/>
         </geometry>
       </collision>
     </link>
 
     <!-- TCP frame -->
-    <!-- TCP is at 0.19515m according to .STL, after measuring appears to be 0.00286m further away -->
+    <!-- TCP is at 0.19515m according to .STL, after measuring appears to be 0.00286m further away, old value with stool-head was 0.19801 -->
+    <!-- TCP is at 0.19515m according to initial .STL, after measuring appears to be 0.00162 further away, modified the .SLDASM so now TCP is at 0.19677-->
     <joint name="${prefix}tcp_joint" type="fixed">
-      <origin xyz="0 0 0.19801" rpy="0 0 0"/>
+      <origin xyz="0 0 0.19677" rpy="0 0 0"/>
       <parent link="${prefix}printhead"/>
       <child link="${prefix}tcp"/>
     </joint>
