@@ -4,6 +4,7 @@ int32 cmd_id  # Unique ID referencing the line-number in the original .gcode fil
 float64 x # Position in mm
 float64 y # Position in mm
 float64 z # Position in mm
+float64 b # Orientation in rad
 float64 f  # Speed of movement in mm/min
 string printing_command  # Raw gCode like "M82"
 bool has_movement  # True if there is a movement command
