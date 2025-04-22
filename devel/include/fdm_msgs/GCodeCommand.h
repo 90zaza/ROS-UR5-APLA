@@ -29,6 +29,7 @@ struct GCodeCommand_
     , x(0.0)
     , y(0.0)
     , z(0.0)
+    , b(0.0)
     , f(0.0)
     , printing_command()
     , has_movement(false)
@@ -41,6 +42,7 @@ struct GCodeCommand_
     , x(0.0)
     , y(0.0)
     , z(0.0)
+    , b(0.0)
     , f(0.0)
     , printing_command(_alloc)
     , has_movement(false)
@@ -65,6 +67,9 @@ struct GCodeCommand_
 
    typedef double _z_type;
   _z_type z;
+
+   typedef double _b_type;
+  _b_type b;
 
    typedef double _f_type;
   _f_type f;
@@ -115,6 +120,7 @@ bool operator==(const ::fdm_msgs::GCodeCommand_<ContainerAllocator1> & lhs, cons
     lhs.x == rhs.x &&
     lhs.y == rhs.y &&
     lhs.z == rhs.z &&
+    lhs.b == rhs.b &&
     lhs.f == rhs.f &&
     lhs.printing_command == rhs.printing_command &&
     lhs.has_movement == rhs.has_movement &&
@@ -176,12 +182,12 @@ struct MD5Sum< ::fdm_msgs::GCodeCommand_<ContainerAllocator> >
 {
   static const char* value()
   {
-    return "adfc96e244d9dd15b863f79af34eb1fe";
+    return "a9792c73d889e17713210aba8d6352d6";
   }
 
   static const char* value(const ::fdm_msgs::GCodeCommand_<ContainerAllocator>&) { return value(); }
-  static const uint64_t static_value1 = 0xadfc96e244d9dd15ULL;
-  static const uint64_t static_value2 = 0xb863f79af34eb1feULL;
+  static const uint64_t static_value1 = 0xa9792c73d889e177ULL;
+  static const uint64_t static_value2 = 0x13210aba8d6352d6ULL;
 };
 
 template<class ContainerAllocator>
@@ -206,6 +212,7 @@ struct Definition< ::fdm_msgs::GCodeCommand_<ContainerAllocator> >
 "float64 x # Position in mm\n"
 "float64 y # Position in mm\n"
 "float64 z # Position in mm\n"
+"float64 b # Orientation in rad\n"
 "float64 f  # Speed of movement in mm/min\n"
 "string printing_command  # Raw gCode like \"M82\"\n"
 "bool has_movement  # True if there is a movement command\n"
@@ -234,6 +241,7 @@ namespace serialization
       stream.next(m.x);
       stream.next(m.y);
       stream.next(m.z);
+      stream.next(m.b);
       stream.next(m.f);
       stream.next(m.printing_command);
       stream.next(m.has_movement);
@@ -267,6 +275,8 @@ struct Printer< ::fdm_msgs::GCodeCommand_<ContainerAllocator> >
     Printer<double>::stream(s, indent + "  ", v.y);
     s << indent << "z: ";
     Printer<double>::stream(s, indent + "  ", v.z);
+    s << indent << "b: ";
+    Printer<double>::stream(s, indent + "  ", v.b);
     s << indent << "f: ";
     Printer<double>::stream(s, indent + "  ", v.f);
     s << indent << "printing_command: ";

@@ -156,9 +156,9 @@ class ToolpathPlanner:
 
         if not None in self.movementPlanList[index[0]]:
             self.movementPlanConsecList[index[0]] = fdm_msgs.msg.MovementPlanConsec()
-            last_time = self.movementPlanList[index[0]][0].trajectory.joint_trajectory.points[-1].time_from_start
+            last_time = self.movementPlanList[index[0]][0].trajectory.joint_trajectory.points[-2].time_from_start
             self.movementPlanConsecList[index[0]].timestamps.append(last_time)
-            self.movementPlanConsecList[index[0]].trajectory.joint_trajectory.points.extend(self.movementPlanList[index[0]][0].trajectory.joint_trajectory.points)
+            self.movementPlanConsecList[index[0]].trajectory.joint_trajectory.points.extend(self.movementPlanList[index[0]][0].trajectory.joint_trajectory.points[:-1])
             if not self.movementPlanConsecList[index[0]].trajectory.joint_trajectory.joint_names:
                 self.movementPlanConsecList[index[0]].trajectory.joint_trajectory.joint_names = self.movementPlanList[index[0]][0].trajectory.joint_trajectory.joint_names
             for mvmPlan in self.movementPlanList[index[0]][1:]:
@@ -166,11 +166,14 @@ class ToolpathPlanner:
                     if point.time_from_start.to_sec() == 0:
                         point.time_from_start += rospy.Duration(nsecs=1)
                     point.time_from_start += last_time
-                last_time = mvmPlan.trajectory.joint_trajectory.points[-1].time_from_start
+                last_time = mvmPlan.trajectory.joint_trajectory.points[-2].time_from_start
                 self.movementPlanConsecList[index[0]].timestamps.append(last_time)
-                self.movementPlanConsecList[index[0]].trajectory.joint_trajectory.points.extend(mvmPlan.trajectory.joint_trajectory.points)
+                self.movementPlanConsecList[index[0]].trajectory.joint_trajectory.points.extend(mvmPlan.trajectory.joint_trajectory.points[:-1])
                 if not self.movementPlanConsecList[index[0]].trajectory.joint_trajectory.joint_names:
                     self.movementPlanConsecList[index[0]].trajectory.joint_trajectory.joint_names = mvmPlan.trajectory.joint_trajectory.joint_names
+            last_time = self.movementPlanList[index[0]][-1].trajectory.joint_trajectory.points[-1].time_from_start
+            self.movementPlanConsecList[index[0]].timestamps[-1] = last_time
+            self.movementPlanConsecList[index[0]].trajectory.joint_trajectory.points.extend(self.movementPlanList[index[0]][-1].trajectory.joint_trajectory.points[-1:])
             self.movementPlanConsecList[index[0]].seq_ids = self.sequentialMovementCommands[index[0]]
 
         if self.totalMovementCommands == self.countedMovementCommands:

@@ -48,6 +48,7 @@ class GCodeInterpreter:
         self.x_value = math.nan
         self.y_value = math.nan
         self.z_value = math.nan
+        self.b_value = math.nan
         self.f_value = math.nan
 
     def line_interpreter(self, gcode_msg):
@@ -80,6 +81,9 @@ class GCodeInterpreter:
                     gcodeCommand_msg.has_movement = True
                 elif param[0] == "Z":
                     self.z_value = float(param[1:])
+                    gcodeCommand_msg.has_movement = True
+                elif param[0] == "B":
+                    self.b_value = float(param[1:])
                     gcodeCommand_msg.has_movement = True
                 elif param[0] == "F":
                     self.f_value = float(param[1:])

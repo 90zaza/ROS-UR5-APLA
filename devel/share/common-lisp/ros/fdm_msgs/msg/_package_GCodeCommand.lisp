@@ -9,6 +9,8 @@
           Y
           Z-VAL
           Z
+          B-VAL
+          B
           F-VAL
           F
           PRINTING_COMMAND-VAL

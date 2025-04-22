@@ -8,7 +8,7 @@ import struct
 
 
 class GCodeCommand(genpy.Message):
-  _md5sum = "adfc96e244d9dd15b863f79af34eb1fe"
+  _md5sum = "a9792c73d889e17713210aba8d6352d6"
   _type = "fdm_msgs/GCodeCommand"
   _has_header = False  # flag to mark the presence of a Header object
   _full_text = """# GCodeCommand.msg
@@ -17,13 +17,14 @@ int32 cmd_id  # Unique ID referencing the line-number in the original .gcode fil
 float64 x # Position in mm
 float64 y # Position in mm
 float64 z # Position in mm
+float64 b # Orientation in rad
 float64 f  # Speed of movement in mm/min
 string printing_command  # Raw gCode like "M82"
 bool has_movement  # True if there is a movement command
 bool has_printing  # True if there is a printing command
 bool is_final # True if it is the final command"""
-  __slots__ = ['seq_id','cmd_id','x','y','z','f','printing_command','has_movement','has_printing','is_final']
-  _slot_types = ['int32','int32','float64','float64','float64','float64','string','bool','bool','bool']
+  __slots__ = ['seq_id','cmd_id','x','y','z','b','f','printing_command','has_movement','has_printing','is_final']
+  _slot_types = ['int32','int32','float64','float64','float64','float64','float64','string','bool','bool','bool']
 
   def __init__(self, *args, **kwds):
     """
@@ -33,7 +34,7 @@ bool is_final # True if it is the final command"""
     changes.  You cannot mix in-order arguments and keyword arguments.
 
     The available fields are:
-       seq_id,cmd_id,x,y,z,f,printing_command,has_movement,has_printing,is_final
+       seq_id,cmd_id,x,y,z,b,f,printing_command,has_movement,has_printing,is_final
 
     :param args: complete set of field values, in .msg order
     :param kwds: use keyword arguments corresponding to message field names
@@ -52,6 +53,8 @@ bool is_final # True if it is the final command"""
         self.y = 0.
       if self.z is None:
         self.z = 0.
+      if self.b is None:
+        self.b = 0.
       if self.f is None:
         self.f = 0.
       if self.printing_command is None:
@@ -68,6 +71,7 @@ bool is_final # True if it is the final command"""
       self.x = 0.
       self.y = 0.
       self.z = 0.
+      self.b = 0.
       self.f = 0.
       self.printing_command = ''
       self.has_movement = False
@@ -87,7 +91,7 @@ bool is_final # True if it is the final command"""
     """
     try:
       _x = self
-      buff.write(_get_struct_2i4d().pack(_x.seq_id, _x.cmd_id, _x.x, _x.y, _x.z, _x.f))
+      buff.write(_get_struct_2i5d().pack(_x.seq_id, _x.cmd_id, _x.x, _x.y, _x.z, _x.b, _x.f))
       _x = self.printing_command
       length = len(_x)
       if python3 or type(_x) == unicode:
@@ -110,8 +114,8 @@ bool is_final # True if it is the final command"""
       end = 0
       _x = self
       start = end
-      end += 40
-      (_x.seq_id, _x.cmd_id, _x.x, _x.y, _x.z, _x.f,) = _get_struct_2i4d().unpack(str[start:end])
+      end += 48
+      (_x.seq_id, _x.cmd_id, _x.x, _x.y, _x.z, _x.b, _x.f,) = _get_struct_2i5d().unpack(str[start:end])
       start = end
       end += 4
       (length,) = _struct_I.unpack(str[start:end])
@@ -141,7 +145,7 @@ bool is_final # True if it is the final command"""
     """
     try:
       _x = self
-      buff.write(_get_struct_2i4d().pack(_x.seq_id, _x.cmd_id, _x.x, _x.y, _x.z, _x.f))
+      buff.write(_get_struct_2i5d().pack(_x.seq_id, _x.cmd_id, _x.x, _x.y, _x.z, _x.b, _x.f))
       _x = self.printing_command
       length = len(_x)
       if python3 or type(_x) == unicode:
@@ -165,8 +169,8 @@ bool is_final # True if it is the final command"""
       end = 0
       _x = self
       start = end
-      end += 40
-      (_x.seq_id, _x.cmd_id, _x.x, _x.y, _x.z, _x.f,) = _get_struct_2i4d().unpack(str[start:end])
+      end += 48
+      (_x.seq_id, _x.cmd_id, _x.x, _x.y, _x.z, _x.b, _x.f,) = _get_struct_2i5d().unpack(str[start:end])
       start = end
       end += 4
       (length,) = _struct_I.unpack(str[start:end])
@@ -191,12 +195,12 @@ _struct_I = genpy.struct_I
 def _get_struct_I():
     global _struct_I
     return _struct_I
-_struct_2i4d = None
-def _get_struct_2i4d():
-    global _struct_2i4d
-    if _struct_2i4d is None:
-        _struct_2i4d = struct.Struct("<2i4d")
-    return _struct_2i4d
+_struct_2i5d = None
+def _get_struct_2i5d():
+    global _struct_2i5d
+    if _struct_2i5d is None:
+        _struct_2i5d = struct.Struct("<2i5d")
+    return _struct_2i5d
 _struct_3B = None
 def _get_struct_3B():
     global _struct_3B

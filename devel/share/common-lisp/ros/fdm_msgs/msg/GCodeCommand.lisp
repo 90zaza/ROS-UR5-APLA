@@ -32,6 +32,11 @@
     :initarg :z
     :type cl:float
     :initform 0.0)
+   (b
+    :reader b
+    :initarg :b
+    :type cl:float
+    :initform 0.0)
    (f
     :reader f
     :initarg :f
@@ -92,6 +97,11 @@
   (roslisp-msg-protocol:msg-deprecation-warning "Using old-style slot reader fdm_msgs-msg:z-val is deprecated.  Use fdm_msgs-msg:z instead.")
   (z m))
 
+(cl:ensure-generic-function 'b-val :lambda-list '(m))
+(cl:defmethod b-val ((m <GCodeCommand>))
+  (roslisp-msg-protocol:msg-deprecation-warning "Using old-style slot reader fdm_msgs-msg:b-val is deprecated.  Use fdm_msgs-msg:b instead.")
+  (b m))
+
 (cl:ensure-generic-function 'f-val :lambda-list '(m))
 (cl:defmethod f-val ((m <GCodeCommand>))
   (roslisp-msg-protocol:msg-deprecation-warning "Using old-style slot reader fdm_msgs-msg:f-val is deprecated.  Use fdm_msgs-msg:f instead.")
@@ -149,6 +159,15 @@
     (cl:write-byte (cl:ldb (cl:byte 8 48) bits) ostream)
     (cl:write-byte (cl:ldb (cl:byte 8 56) bits) ostream))
   (cl:let ((bits (roslisp-utils:encode-double-float-bits (cl:slot-value msg 'z))))
+    (cl:write-byte (cl:ldb (cl:byte 8 0) bits) ostream)
+    (cl:write-byte (cl:ldb (cl:byte 8 8) bits) ostream)
+    (cl:write-byte (cl:ldb (cl:byte 8 16) bits) ostream)
+    (cl:write-byte (cl:ldb (cl:byte 8 24) bits) ostream)
+    (cl:write-byte (cl:ldb (cl:byte 8 32) bits) ostream)
+    (cl:write-byte (cl:ldb (cl:byte 8 40) bits) ostream)
+    (cl:write-byte (cl:ldb (cl:byte 8 48) bits) ostream)
+    (cl:write-byte (cl:ldb (cl:byte 8 56) bits) ostream))
+  (cl:let ((bits (roslisp-utils:encode-double-float-bits (cl:slot-value msg 'b))))
     (cl:write-byte (cl:ldb (cl:byte 8 0) bits) ostream)
     (cl:write-byte (cl:ldb (cl:byte 8 8) bits) ostream)
     (cl:write-byte (cl:ldb (cl:byte 8 16) bits) ostream)
@@ -229,6 +248,16 @@
       (cl:setf (cl:ldb (cl:byte 8 40) bits) (cl:read-byte istream))
       (cl:setf (cl:ldb (cl:byte 8 48) bits) (cl:read-byte istream))
       (cl:setf (cl:ldb (cl:byte 8 56) bits) (cl:read-byte istream))
+    (cl:setf (cl:slot-value msg 'b) (roslisp-utils:decode-double-float-bits bits)))
+    (cl:let ((bits 0))
+      (cl:setf (cl:ldb (cl:byte 8 0) bits) (cl:read-byte istream))
+      (cl:setf (cl:ldb (cl:byte 8 8) bits) (cl:read-byte istream))
+      (cl:setf (cl:ldb (cl:byte 8 16) bits) (cl:read-byte istream))
+      (cl:setf (cl:ldb (cl:byte 8 24) bits) (cl:read-byte istream))
+      (cl:setf (cl:ldb (cl:byte 8 32) bits) (cl:read-byte istream))
+      (cl:setf (cl:ldb (cl:byte 8 40) bits) (cl:read-byte istream))
+      (cl:setf (cl:ldb (cl:byte 8 48) bits) (cl:read-byte istream))
+      (cl:setf (cl:ldb (cl:byte 8 56) bits) (cl:read-byte istream))
     (cl:setf (cl:slot-value msg 'f) (roslisp-utils:decode-double-float-bits bits)))
     (cl:let ((__ros_str_len 0))
       (cl:setf (cl:ldb (cl:byte 8 0) __ros_str_len) (cl:read-byte istream))
@@ -251,20 +280,21 @@
   "fdm_msgs/GCodeCommand")
 (cl:defmethod roslisp-msg-protocol:md5sum ((type (cl:eql '<GCodeCommand>)))
   "Returns md5sum for a message object of type '<GCodeCommand>"
-  "adfc96e244d9dd15b863f79af34eb1fe")
+  "a9792c73d889e17713210aba8d6352d6")
 (cl:defmethod roslisp-msg-protocol:md5sum ((type (cl:eql 'GCodeCommand)))
   "Returns md5sum for a message object of type 'GCodeCommand"
-  "adfc96e244d9dd15b863f79af34eb1fe")
+  "a9792c73d889e17713210aba8d6352d6")
 (cl:defmethod roslisp-msg-protocol:message-definition ((type (cl:eql '<GCodeCommand>)))
   "Returns full string definition for message of type '<GCodeCommand>"
-  (cl:format cl:nil "# GCodeCommand.msg~%int32 seq_id  # Unique ID to maintain execution order~%int32 cmd_id  # Unique ID referencing the line-number in the original .gcode file~%float64 x # Position in mm~%float64 y # Position in mm~%float64 z # Position in mm~%float64 f  # Speed of movement in mm/min~%string printing_command  # Raw gCode like \"M82\"~%bool has_movement  # True if there is a movement command~%bool has_printing  # True if there is a printing command~%bool is_final # True if it is the final command~%~%"))
+  (cl:format cl:nil "# GCodeCommand.msg~%int32 seq_id  # Unique ID to maintain execution order~%int32 cmd_id  # Unique ID referencing the line-number in the original .gcode file~%float64 x # Position in mm~%float64 y # Position in mm~%float64 z # Position in mm~%float64 b # Orientation in rad~%float64 f  # Speed of movement in mm/min~%string printing_command  # Raw gCode like \"M82\"~%bool has_movement  # True if there is a movement command~%bool has_printing  # True if there is a printing command~%bool is_final # True if it is the final command~%~%"))
 (cl:defmethod roslisp-msg-protocol:message-definition ((type (cl:eql 'GCodeCommand)))
   "Returns full string definition for message of type 'GCodeCommand"
-  (cl:format cl:nil "# GCodeCommand.msg~%int32 seq_id  # Unique ID to maintain execution order~%int32 cmd_id  # Unique ID referencing the line-number in the original .gcode file~%float64 x # Position in mm~%float64 y # Position in mm~%float64 z # Position in mm~%float64 f  # Speed of movement in mm/min~%string printing_command  # Raw gCode like \"M82\"~%bool has_movement  # True if there is a movement command~%bool has_printing  # True if there is a printing command~%bool is_final # True if it is the final command~%~%"))
+  (cl:format cl:nil "# GCodeCommand.msg~%int32 seq_id  # Unique ID to maintain execution order~%int32 cmd_id  # Unique ID referencing the line-number in the original .gcode file~%float64 x # Position in mm~%float64 y # Position in mm~%float64 z # Position in mm~%float64 b # Orientation in rad~%float64 f  # Speed of movement in mm/min~%string printing_command  # Raw gCode like \"M82\"~%bool has_movement  # True if there is a movement command~%bool has_printing  # True if there is a printing command~%bool is_final # True if it is the final command~%~%"))
 (cl:defmethod roslisp-msg-protocol:serialization-length ((msg <GCodeCommand>))
   (cl:+ 0
      4
      4
+     8
      8
      8
      8
@@ -282,6 +312,7 @@
     (cl:cons ':x (x msg))
     (cl:cons ':y (y msg))
     (cl:cons ':z (z msg))
+    (cl:cons ':b (b msg))
     (cl:cons ':f (f msg))
     (cl:cons ':printing_command (printing_command msg))
     (cl:cons ':has_movement (has_movement msg))

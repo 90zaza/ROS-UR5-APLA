@@ -113,12 +113,17 @@ class ToolpathPlanner:
             self.move_group.limit_max_cartesian_link_speed(cmd.f * 1.66666667e-5, link_name='tcp')
         if not math.isnan(cmd.x):
             self.pose_goal.position.x = cmd.x * 0.001
-        
         if not math.isnan(cmd.y):
             self.pose_goal.position.y = cmd.y * 0.001
-
         if not math.isnan(cmd.z):
             self.pose_goal.position.z = cmd.z * 0.001
+        if not math.isnan(cmd.b):
+            self.quaternion = quaternion_from_euler(pi, cmd.b, pi)
+            self.pose_goal.orientation.x = self.quaternion[0]
+            self.pose_goal.orientation.y = self.quaternion[1]
+            self.pose_goal.orientation.z = self.quaternion[2]
+            self.pose_goal.orientation.w = self.quaternion[3]
+
         self.movementPlanMSG.seq_id = cmd.seq_id
         self.computePlanPose()
         return
@@ -126,7 +131,7 @@ class ToolpathPlanner:
     def computePlanPose(self):
         (self.plan, self.fraction) = self.move_group.compute_cartesian_path(
                                        [copy.deepcopy(self.pose_goal)],
-                                       0.01,
+                                       0.0005,
                                        False)
         self.movementPlanMSG.trajectory = self.plan
         self.movementPlanMSG.execution_time = self.plan.joint_trajectory.points[-1].time_from_start

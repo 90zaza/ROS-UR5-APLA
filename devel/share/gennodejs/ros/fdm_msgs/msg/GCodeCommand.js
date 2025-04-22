@@ -23,6 +23,7 @@ class GCodeCommand {
       this.x = null;
       this.y = null;
       this.z = null;
+      this.b = null;
       this.f = null;
       this.printing_command = null;
       this.has_movement = null;
@@ -59,6 +60,12 @@ class GCodeCommand {
       }
       else {
         this.z = 0.0;
+      }
+      if (initObj.hasOwnProperty('b')) {
+        this.b = initObj.b
+      }
+      else {
+        this.b = 0.0;
       }
       if (initObj.hasOwnProperty('f')) {
         this.f = initObj.f
@@ -105,6 +112,8 @@ class GCodeCommand {
     bufferOffset = _serializer.float64(obj.y, buffer, bufferOffset);
     // Serialize message field [z]
     bufferOffset = _serializer.float64(obj.z, buffer, bufferOffset);
+    // Serialize message field [b]
+    bufferOffset = _serializer.float64(obj.b, buffer, bufferOffset);
     // Serialize message field [f]
     bufferOffset = _serializer.float64(obj.f, buffer, bufferOffset);
     // Serialize message field [printing_command]
@@ -132,6 +141,8 @@ class GCodeCommand {
     data.y = _deserializer.float64(buffer, bufferOffset);
     // Deserialize message field [z]
     data.z = _deserializer.float64(buffer, bufferOffset);
+    // Deserialize message field [b]
+    data.b = _deserializer.float64(buffer, bufferOffset);
     // Deserialize message field [f]
     data.f = _deserializer.float64(buffer, bufferOffset);
     // Deserialize message field [printing_command]
@@ -148,7 +159,7 @@ class GCodeCommand {
   static getMessageSize(object) {
     let length = 0;
     length += _getByteLength(object.printing_command);
-    return length + 47;
+    return length + 55;
   }
 
   static datatype() {
@@ -158,7 +169,7 @@ class GCodeCommand {
 
   static md5sum() {
     //Returns md5sum for a message object
-    return 'adfc96e244d9dd15b863f79af34eb1fe';
+    return 'a9792c73d889e17713210aba8d6352d6';
   }
 
   static messageDefinition() {
@@ -170,6 +181,7 @@ class GCodeCommand {
     float64 x # Position in mm
     float64 y # Position in mm
     float64 z # Position in mm
+    float64 b # Orientation in rad
     float64 f  # Speed of movement in mm/min
     string printing_command  # Raw gCode like "M82"
     bool has_movement  # True if there is a movement command
@@ -217,6 +229,13 @@ class GCodeCommand {
     }
     else {
       resolved.z = 0.0
+    }
+
+    if (msg.b !== undefined) {
+      resolved.b = msg.b;
+    }
+    else {
+      resolved.b = 0.0
     }
 
     if (msg.f !== undefined) {

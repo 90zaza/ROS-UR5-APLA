@@ -14,7 +14,7 @@
 
 (defclass fdm_msgs::GCodeCommand
   :super ros::object
-  :slots (_seq_id _cmd_id _x _y _z _f _printing_command _has_movement _has_printing _is_final ))
+  :slots (_seq_id _cmd_id _x _y _z _b _f _printing_command _has_movement _has_printing _is_final ))
 
 (defmethod fdm_msgs::GCodeCommand
   (:init
@@ -24,6 +24,7 @@
     ((:x __x) 0.0)
     ((:y __y) 0.0)
     ((:z __z) 0.0)
+    ((:b __b) 0.0)
     ((:f __f) 0.0)
     ((:printing_command __printing_command) "")
     ((:has_movement __has_movement) nil)
@@ -36,6 +37,7 @@
    (setq _x (float __x))
    (setq _y (float __y))
    (setq _z (float __z))
+   (setq _b (float __b))
    (setq _f (float __f))
    (setq _printing_command (string __printing_command))
    (setq _has_movement __has_movement)
@@ -57,6 +59,9 @@
   (:z
    (&optional __z)
    (if __z (setq _z __z)) _z)
+  (:b
+   (&optional __b)
+   (if __b (setq _b __b)) _b)
   (:f
    (&optional __f)
    (if __f (setq _f __f)) _f)
@@ -85,6 +90,8 @@
     8
     ;; float64 _z
     8
+    ;; float64 _b
+    8
     ;; float64 _f
     8
     ;; string _printing_command
@@ -110,6 +117,8 @@
        (sys::poke _y (send s :buffer) (send s :count) :double) (incf (stream-count s) 8)
      ;; float64 _z
        (sys::poke _z (send s :buffer) (send s :count) :double) (incf (stream-count s) 8)
+     ;; float64 _b
+       (sys::poke _b (send s :buffer) (send s :count) :double) (incf (stream-count s) 8)
      ;; float64 _f
        (sys::poke _f (send s :buffer) (send s :count) :double) (incf (stream-count s) 8)
      ;; string _printing_command
@@ -134,6 +143,8 @@
      (setq _y (sys::peek buf ptr- :double)) (incf ptr- 8)
    ;; float64 _z
      (setq _z (sys::peek buf ptr- :double)) (incf ptr- 8)
+   ;; float64 _b
+     (setq _b (sys::peek buf ptr- :double)) (incf ptr- 8)
    ;; float64 _f
      (setq _f (sys::peek buf ptr- :double)) (incf ptr- 8)
    ;; string _printing_command
@@ -148,7 +159,7 @@
    self)
   )
 
-(setf (get fdm_msgs::GCodeCommand :md5sum-) "adfc96e244d9dd15b863f79af34eb1fe")
+(setf (get fdm_msgs::GCodeCommand :md5sum-) "a9792c73d889e17713210aba8d6352d6")
 (setf (get fdm_msgs::GCodeCommand :datatype-) "fdm_msgs/GCodeCommand")
 (setf (get fdm_msgs::GCodeCommand :definition-)
       "# GCodeCommand.msg
@@ -157,6 +168,7 @@ int32 cmd_id  # Unique ID referencing the line-number in the original .gcode fil
 float64 x # Position in mm
 float64 y # Position in mm
 float64 z # Position in mm
+float64 b # Orientation in rad
 float64 f  # Speed of movement in mm/min
 string printing_command  # Raw gCode like \"M82\"
 bool has_movement  # True if there is a movement command
@@ -166,6 +178,6 @@ bool is_final # True if it is the final command
 
 
 
-(provide :fdm_msgs/GCodeCommand "adfc96e244d9dd15b863f79af34eb1fe")
+(provide :fdm_msgs/GCodeCommand "a9792c73d889e17713210aba8d6352d6")
 
 
