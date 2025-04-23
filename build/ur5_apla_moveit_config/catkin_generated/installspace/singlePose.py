@@ -73,9 +73,9 @@ if __name__ == '__main__':
 
     # Planning for two points
     pose_goal = geometry_msgs.msg.Pose()
-    pose_goal.position.x = 0.15
-    pose_goal.position.y = 0.15
-    pose_goal.position.z = 0.1
+    pose_goal.position.x = 0.2
+    pose_goal.position.y = 0.06
+    pose_goal.position.z = 0
 
     #For world frame
     # quaternion = quaternion_from_euler(pi, 0, 0)
@@ -142,7 +142,7 @@ if __name__ == '__main__':
     display_trajectory.trajectory.append(plan)
     display_trajectory_publisher.publish(display_trajectory)
 
-    print(plan)
+    # print(plan)
 
     move_group.execute(plan, wait=False)
     move_group.stop()

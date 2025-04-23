@@ -5,6 +5,7 @@ import std_msgs.msg
 import fdm_msgs.msg
 import sys
 import os
+import math
 import threading
 
 class Communication:
@@ -156,24 +157,24 @@ class ToolpathPlanner:
 
         if not None in self.movementPlanList[index[0]]:
             self.movementPlanConsecList[index[0]] = fdm_msgs.msg.MovementPlanConsec()
-            last_time = self.movementPlanList[index[0]][0].trajectory.joint_trajectory.points[-2].time_from_start
+            last_time = self.movementPlanList[index[0]][0].trajectory.joint_trajectory.points[-1].time_from_start
             self.movementPlanConsecList[index[0]].timestamps.append(last_time)
-            self.movementPlanConsecList[index[0]].trajectory.joint_trajectory.points.extend(self.movementPlanList[index[0]][0].trajectory.joint_trajectory.points[:-1])
+            self.movementPlanConsecList[index[0]].trajectory.joint_trajectory.points.extend(self.movementPlanList[index[0]][0].trajectory.joint_trajectory.points)
             if not self.movementPlanConsecList[index[0]].trajectory.joint_trajectory.joint_names:
                 self.movementPlanConsecList[index[0]].trajectory.joint_trajectory.joint_names = self.movementPlanList[index[0]][0].trajectory.joint_trajectory.joint_names
             for mvmPlan in self.movementPlanList[index[0]][1:]:
                 for point in mvmPlan.trajectory.joint_trajectory.points:
-                    if point.time_from_start.to_sec() == 0:
-                        point.time_from_start += rospy.Duration(nsecs=1)
+                    # if point.time_from_start.to_sec() == 0:
+                    #     point.time_from_start += rospy.Duration(nsecs=1)
                     point.time_from_start += last_time
-                last_time = mvmPlan.trajectory.joint_trajectory.points[-2].time_from_start
+                last_time = mvmPlan.trajectory.joint_trajectory.points[-1].time_from_start
                 self.movementPlanConsecList[index[0]].timestamps.append(last_time)
-                self.movementPlanConsecList[index[0]].trajectory.joint_trajectory.points.extend(mvmPlan.trajectory.joint_trajectory.points[:-1])
+                self.movementPlanConsecList[index[0]].trajectory.joint_trajectory.points.extend(mvmPlan.trajectory.joint_trajectory.points[1:])
                 if not self.movementPlanConsecList[index[0]].trajectory.joint_trajectory.joint_names:
                     self.movementPlanConsecList[index[0]].trajectory.joint_trajectory.joint_names = mvmPlan.trajectory.joint_trajectory.joint_names
-            last_time = self.movementPlanList[index[0]][-1].trajectory.joint_trajectory.points[-1].time_from_start
-            self.movementPlanConsecList[index[0]].timestamps[-1] = last_time
-            self.movementPlanConsecList[index[0]].trajectory.joint_trajectory.points.extend(self.movementPlanList[index[0]][-1].trajectory.joint_trajectory.points[-1:])
+            # last_time = self.movementPlanList[index[0]][-1].trajectory.joint_trajectory.points[-1].time_from_start
+            # self.movementPlanConsecList[index[0]].timestamps[-1] = last_time
+            # self.movementPlanConsecList[index[0]].trajectory.joint_trajectory.points.extend(self.movementPlanList[index[0]][-1].trajectory.joint_trajectory.points[-1:])
             self.movementPlanConsecList[index[0]].seq_ids = self.sequentialMovementCommands[index[0]]
 
         if self.totalMovementCommands == self.countedMovementCommands:
@@ -197,17 +198,36 @@ class Executer:
                 finalCMD.seq_ids = [-1]
                 self.comms.publish_movement_execution(finalCMD)
                 return
+            # if gcodeCommandList[cmdCounter].has_movement:
+            #     print(f'Executing movementPlanList[{mvmCounter}]')
+            #     self.comms.publish_movement_execution(movementPlanList[mvmCounter])
+                    
+            #     for i in range(len(movementPlanList[mvmCounter].timestamps)):
+            #         print(f'Sending gcodeCommand {gcodeCommandList[cmdCounter].printing_command}')
+            #         self.comms.publish_duet_request(gcodeCommandList[cmdCounter])
+            #         cmdCounter += 1
+            #         if i == 0:
+            #             rospy.sleep(movementPlanList[mvmCounter].timestamps[i])
+            #         rospy.sleep(movementPlanList[mvmCounter].timestamps[i] - movementPlanList[mvmCounter].timestamps[i-1])
+            #     mvmCounter += 1
             if gcodeCommandList[cmdCounter].has_movement:
                 print(f'Executing movementPlanList[{mvmCounter}]')
                 self.comms.publish_movement_execution(movementPlanList[mvmCounter])
-                    
+
                 for i in range(len(movementPlanList[mvmCounter].timestamps)):
-                    print(f'Sending gcodeCommand {gcodeCommandList[cmdCounter].printing_command}')
-                    self.comms.publish_duet_request(gcodeCommandList[cmdCounter])
-                    cmdCounter += 1
                     if i == 0:
                         rospy.sleep(movementPlanList[mvmCounter].timestamps[i])
-                    rospy.sleep(movementPlanList[mvmCounter].timestamps[i] - movementPlanList[mvmCounter].timestamps[i-1])
+                    exec_time = movementPlanList[mvmCounter].timestamps[i] - movementPlanList[mvmCounter].timestamps[i-1]
+                    if gcodeCommandList[cmdCounter].has_extrusion:
+                        # print(f'Current e {gcodeCommandList[cmdCounter].e}, timestamp[i]: {movementPlanList[mvmCounter].timestamps[i]}, timesetamp[i-1]: {movementPlanList[mvmCounter].timestamps[i-1]}, current exec_time: {exec_time}')
+                        exec_time_mins = exec_time.to_sec() / 60
+                        f = gcodeCommandList[cmdCounter].e / exec_time_mins
+                        cmd = f"G1 F{f:.5f} E{gcodeCommandList[cmdCounter].e:.5f}"
+                        gcodeCommandList[cmdCounter].printing_command = cmd
+                        print(f'Sending gcodeCommand: {cmd}')
+                        self.comms.publish_duet_request(gcodeCommandList[cmdCounter])
+                    rospy.sleep(exec_time)
+                    cmdCounter += 1
                 mvmCounter += 1
 
             print(f'Sending gcodeCommand {gcodeCommandList[cmdCounter].printing_command}')

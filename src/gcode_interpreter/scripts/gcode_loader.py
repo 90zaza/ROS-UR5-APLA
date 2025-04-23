@@ -50,6 +50,7 @@ class GCodeInterpreter:
         self.z_value = math.nan
         self.b_value = math.nan
         self.f_value = math.nan
+        self.e_value = math.nan
 
     def line_interpreter(self, gcode_msg):
         for line in gcode_msg.lines:
@@ -87,7 +88,11 @@ class GCodeInterpreter:
                     gcodeCommand_msg.has_movement = True
                 elif param[0] == "F":
                     self.f_value = float(param[1:])
-                    hasF = True
+                    # hasF = True
+                elif param[0] == "E":
+                    if float(param[1:]) != 0:
+                        self.e_value = float(param[1:])
+                        gcodeCommand_msg.has_extrusion = True
                 # else:
                 #     printing_command.append(param)
 
@@ -95,6 +100,7 @@ class GCodeInterpreter:
             gcodeCommand_msg.y = self.y_value
             gcodeCommand_msg.z = self.z_value
             gcodeCommand_msg.f = self.f_value
+            gcodeCommand_msg.e = self.e_value
 
             if len(printing_command) > 0:
                 # gcodeCommand_msg.printing_command = " ".join(printing_command)
@@ -106,6 +112,7 @@ class GCodeInterpreter:
             
             self.seq_id += 1
             self.cmd_id += 1
+
             self.comms.publish_gcode_command(gcodeCommand_msg)
         
 def main():

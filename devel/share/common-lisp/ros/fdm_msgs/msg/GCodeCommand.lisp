@@ -42,6 +42,11 @@
     :initarg :f
     :type cl:float
     :initform 0.0)
+   (e
+    :reader e
+    :initarg :e
+    :type cl:float
+    :initform 0.0)
    (printing_command
     :reader printing_command
     :initarg :printing_command
@@ -55,6 +60,11 @@
    (has_printing
     :reader has_printing
     :initarg :has_printing
+    :type cl:boolean
+    :initform cl:nil)
+   (has_extrusion
+    :reader has_extrusion
+    :initarg :has_extrusion
     :type cl:boolean
     :initform cl:nil)
    (is_final
@@ -107,6 +117,11 @@
   (roslisp-msg-protocol:msg-deprecation-warning "Using old-style slot reader fdm_msgs-msg:f-val is deprecated.  Use fdm_msgs-msg:f instead.")
   (f m))
 
+(cl:ensure-generic-function 'e-val :lambda-list '(m))
+(cl:defmethod e-val ((m <GCodeCommand>))
+  (roslisp-msg-protocol:msg-deprecation-warning "Using old-style slot reader fdm_msgs-msg:e-val is deprecated.  Use fdm_msgs-msg:e instead.")
+  (e m))
+
 (cl:ensure-generic-function 'printing_command-val :lambda-list '(m))
 (cl:defmethod printing_command-val ((m <GCodeCommand>))
   (roslisp-msg-protocol:msg-deprecation-warning "Using old-style slot reader fdm_msgs-msg:printing_command-val is deprecated.  Use fdm_msgs-msg:printing_command instead.")
@@ -121,6 +136,11 @@
 (cl:defmethod has_printing-val ((m <GCodeCommand>))
   (roslisp-msg-protocol:msg-deprecation-warning "Using old-style slot reader fdm_msgs-msg:has_printing-val is deprecated.  Use fdm_msgs-msg:has_printing instead.")
   (has_printing m))
+
+(cl:ensure-generic-function 'has_extrusion-val :lambda-list '(m))
+(cl:defmethod has_extrusion-val ((m <GCodeCommand>))
+  (roslisp-msg-protocol:msg-deprecation-warning "Using old-style slot reader fdm_msgs-msg:has_extrusion-val is deprecated.  Use fdm_msgs-msg:has_extrusion instead.")
+  (has_extrusion m))
 
 (cl:ensure-generic-function 'is_final-val :lambda-list '(m))
 (cl:defmethod is_final-val ((m <GCodeCommand>))
@@ -185,6 +205,15 @@
     (cl:write-byte (cl:ldb (cl:byte 8 40) bits) ostream)
     (cl:write-byte (cl:ldb (cl:byte 8 48) bits) ostream)
     (cl:write-byte (cl:ldb (cl:byte 8 56) bits) ostream))
+  (cl:let ((bits (roslisp-utils:encode-double-float-bits (cl:slot-value msg 'e))))
+    (cl:write-byte (cl:ldb (cl:byte 8 0) bits) ostream)
+    (cl:write-byte (cl:ldb (cl:byte 8 8) bits) ostream)
+    (cl:write-byte (cl:ldb (cl:byte 8 16) bits) ostream)
+    (cl:write-byte (cl:ldb (cl:byte 8 24) bits) ostream)
+    (cl:write-byte (cl:ldb (cl:byte 8 32) bits) ostream)
+    (cl:write-byte (cl:ldb (cl:byte 8 40) bits) ostream)
+    (cl:write-byte (cl:ldb (cl:byte 8 48) bits) ostream)
+    (cl:write-byte (cl:ldb (cl:byte 8 56) bits) ostream))
   (cl:let ((__ros_str_len (cl:length (cl:slot-value msg 'printing_command))))
     (cl:write-byte (cl:ldb (cl:byte 8 0) __ros_str_len) ostream)
     (cl:write-byte (cl:ldb (cl:byte 8 8) __ros_str_len) ostream)
@@ -193,6 +222,7 @@
   (cl:map cl:nil #'(cl:lambda (c) (cl:write-byte (cl:char-code c) ostream)) (cl:slot-value msg 'printing_command))
   (cl:write-byte (cl:ldb (cl:byte 8 0) (cl:if (cl:slot-value msg 'has_movement) 1 0)) ostream)
   (cl:write-byte (cl:ldb (cl:byte 8 0) (cl:if (cl:slot-value msg 'has_printing) 1 0)) ostream)
+  (cl:write-byte (cl:ldb (cl:byte 8 0) (cl:if (cl:slot-value msg 'has_extrusion) 1 0)) ostream)
   (cl:write-byte (cl:ldb (cl:byte 8 0) (cl:if (cl:slot-value msg 'is_final) 1 0)) ostream)
 )
 (cl:defmethod roslisp-msg-protocol:deserialize ((msg <GCodeCommand>) istream)
@@ -259,6 +289,16 @@
       (cl:setf (cl:ldb (cl:byte 8 48) bits) (cl:read-byte istream))
       (cl:setf (cl:ldb (cl:byte 8 56) bits) (cl:read-byte istream))
     (cl:setf (cl:slot-value msg 'f) (roslisp-utils:decode-double-float-bits bits)))
+    (cl:let ((bits 0))
+      (cl:setf (cl:ldb (cl:byte 8 0) bits) (cl:read-byte istream))
+      (cl:setf (cl:ldb (cl:byte 8 8) bits) (cl:read-byte istream))
+      (cl:setf (cl:ldb (cl:byte 8 16) bits) (cl:read-byte istream))
+      (cl:setf (cl:ldb (cl:byte 8 24) bits) (cl:read-byte istream))
+      (cl:setf (cl:ldb (cl:byte 8 32) bits) (cl:read-byte istream))
+      (cl:setf (cl:ldb (cl:byte 8 40) bits) (cl:read-byte istream))
+      (cl:setf (cl:ldb (cl:byte 8 48) bits) (cl:read-byte istream))
+      (cl:setf (cl:ldb (cl:byte 8 56) bits) (cl:read-byte istream))
+    (cl:setf (cl:slot-value msg 'e) (roslisp-utils:decode-double-float-bits bits)))
     (cl:let ((__ros_str_len 0))
       (cl:setf (cl:ldb (cl:byte 8 0) __ros_str_len) (cl:read-byte istream))
       (cl:setf (cl:ldb (cl:byte 8 8) __ros_str_len) (cl:read-byte istream))
@@ -269,6 +309,7 @@
         (cl:setf (cl:char (cl:slot-value msg 'printing_command) __ros_str_idx) (cl:code-char (cl:read-byte istream)))))
     (cl:setf (cl:slot-value msg 'has_movement) (cl:not (cl:zerop (cl:read-byte istream))))
     (cl:setf (cl:slot-value msg 'has_printing) (cl:not (cl:zerop (cl:read-byte istream))))
+    (cl:setf (cl:slot-value msg 'has_extrusion) (cl:not (cl:zerop (cl:read-byte istream))))
     (cl:setf (cl:slot-value msg 'is_final) (cl:not (cl:zerop (cl:read-byte istream))))
   msg
 )
@@ -280,16 +321,16 @@
   "fdm_msgs/GCodeCommand")
 (cl:defmethod roslisp-msg-protocol:md5sum ((type (cl:eql '<GCodeCommand>)))
   "Returns md5sum for a message object of type '<GCodeCommand>"
-  "a9792c73d889e17713210aba8d6352d6")
+  "352c65e2dbd785cfb0a63fed83c40bb7")
 (cl:defmethod roslisp-msg-protocol:md5sum ((type (cl:eql 'GCodeCommand)))
   "Returns md5sum for a message object of type 'GCodeCommand"
-  "a9792c73d889e17713210aba8d6352d6")
+  "352c65e2dbd785cfb0a63fed83c40bb7")
 (cl:defmethod roslisp-msg-protocol:message-definition ((type (cl:eql '<GCodeCommand>)))
   "Returns full string definition for message of type '<GCodeCommand>"
-  (cl:format cl:nil "# GCodeCommand.msg~%int32 seq_id  # Unique ID to maintain execution order~%int32 cmd_id  # Unique ID referencing the line-number in the original .gcode file~%float64 x # Position in mm~%float64 y # Position in mm~%float64 z # Position in mm~%float64 b # Orientation in rad~%float64 f  # Speed of movement in mm/min~%string printing_command  # Raw gCode like \"M82\"~%bool has_movement  # True if there is a movement command~%bool has_printing  # True if there is a printing command~%bool is_final # True if it is the final command~%~%"))
+  (cl:format cl:nil "# GCodeCommand.msg~%int32 seq_id  # Unique ID to maintain execution order~%int32 cmd_id  # Unique ID referencing the line-number in the original .gcode file~%float64 x # Position in mm~%float64 y # Position in mm~%float64 z # Position in mm~%float64 b # Orientation in rad~%float64 f # Speed of movement in mm/min~%float64 e # Relative amount of filament in mm~%string printing_command  # Raw gCode like \"M82\"~%bool has_movement  # True if there is a movement command~%bool has_printing  # True if there is a printing command~%bool has_extrusion # True if there is an extrusion command~%bool is_final # True if it is the final command~%~%"))
 (cl:defmethod roslisp-msg-protocol:message-definition ((type (cl:eql 'GCodeCommand)))
   "Returns full string definition for message of type 'GCodeCommand"
-  (cl:format cl:nil "# GCodeCommand.msg~%int32 seq_id  # Unique ID to maintain execution order~%int32 cmd_id  # Unique ID referencing the line-number in the original .gcode file~%float64 x # Position in mm~%float64 y # Position in mm~%float64 z # Position in mm~%float64 b # Orientation in rad~%float64 f  # Speed of movement in mm/min~%string printing_command  # Raw gCode like \"M82\"~%bool has_movement  # True if there is a movement command~%bool has_printing  # True if there is a printing command~%bool is_final # True if it is the final command~%~%"))
+  (cl:format cl:nil "# GCodeCommand.msg~%int32 seq_id  # Unique ID to maintain execution order~%int32 cmd_id  # Unique ID referencing the line-number in the original .gcode file~%float64 x # Position in mm~%float64 y # Position in mm~%float64 z # Position in mm~%float64 b # Orientation in rad~%float64 f # Speed of movement in mm/min~%float64 e # Relative amount of filament in mm~%string printing_command  # Raw gCode like \"M82\"~%bool has_movement  # True if there is a movement command~%bool has_printing  # True if there is a printing command~%bool has_extrusion # True if there is an extrusion command~%bool is_final # True if it is the final command~%~%"))
 (cl:defmethod roslisp-msg-protocol:serialization-length ((msg <GCodeCommand>))
   (cl:+ 0
      4
@@ -299,7 +340,9 @@
      8
      8
      8
+     8
      4 (cl:length (cl:slot-value msg 'printing_command))
+     1
      1
      1
      1
@@ -314,8 +357,10 @@
     (cl:cons ':z (z msg))
     (cl:cons ':b (b msg))
     (cl:cons ':f (f msg))
+    (cl:cons ':e (e msg))
     (cl:cons ':printing_command (printing_command msg))
     (cl:cons ':has_movement (has_movement msg))
     (cl:cons ':has_printing (has_printing msg))
+    (cl:cons ':has_extrusion (has_extrusion msg))
     (cl:cons ':is_final (is_final msg))
 ))

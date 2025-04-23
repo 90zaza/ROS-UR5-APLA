@@ -48,7 +48,9 @@ class GCodeInterpreter:
         self.x_value = math.nan
         self.y_value = math.nan
         self.z_value = math.nan
+        self.b_value = math.nan
         self.f_value = math.nan
+        self.e_value = math.nan
 
     def line_interpreter(self, gcode_msg):
         for line in gcode_msg.lines:
@@ -68,7 +70,9 @@ class GCodeInterpreter:
                 continue
             
             parameters = command.split()
-            printing_command = command
+            print(f'parameters {parameters}')
+            printing_command = []
+            print(f'printing_command {printing_command}')
             hasF = False
 
             for param in parameters:
@@ -81,27 +85,42 @@ class GCodeInterpreter:
                 elif param[0] == "Z":
                     self.z_value = float(param[1:])
                     gcodeCommand_msg.has_movement = True
+                elif param[0] == "B":
+                    self.b_value = float(param[1:])
+                    gcodeCommand_msg.has_movement = True
                 elif param[0] == "F":
                     self.f_value = float(param[1:])
-                    hasF = True
-                # else:
-                #     printing_command.append(param)
+                    # hasF = True
+                elif param[0] == "E":
+                    if float(param[1:]) != 0:
+                        self.e_value = float(param[1:])
+                        gcodeCommand_msg.has_extrusion = True
+                elif param == "G1":
+                    continue
+                else:
+                    printing_command.append(param)
 
             gcodeCommand_msg.x = self.x_value
             gcodeCommand_msg.y = self.y_value
             gcodeCommand_msg.z = self.z_value
             gcodeCommand_msg.f = self.f_value
+            gcodeCommand_msg.e = self.e_value
+
+            self.e_value = math.nan
 
             if len(printing_command) > 0:
-                # gcodeCommand_msg.printing_command = " ".join(printing_command)
+                gcodeCommand_msg.printing_command = " ".join(printing_command)
                 # if hasF:
                 #     gcodeCommand_msg.printing_command += " F" + str(gcodeCommand_msg.f)
                 
                 gcodeCommand_msg.has_printing = True
-                gcodeCommand_msg.printing_command = printing_command
+                # gcodeCommand_msg.printing_command = printing_command
             
             self.seq_id += 1
             self.cmd_id += 1
+
+            print(gcodeCommand_msg)
+
             self.comms.publish_gcode_command(gcodeCommand_msg)
         
 def main():

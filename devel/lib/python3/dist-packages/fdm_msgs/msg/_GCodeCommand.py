@@ -8,7 +8,7 @@ import struct
 
 
 class GCodeCommand(genpy.Message):
-  _md5sum = "a9792c73d889e17713210aba8d6352d6"
+  _md5sum = "352c65e2dbd785cfb0a63fed83c40bb7"
   _type = "fdm_msgs/GCodeCommand"
   _has_header = False  # flag to mark the presence of a Header object
   _full_text = """# GCodeCommand.msg
@@ -18,13 +18,15 @@ float64 x # Position in mm
 float64 y # Position in mm
 float64 z # Position in mm
 float64 b # Orientation in rad
-float64 f  # Speed of movement in mm/min
+float64 f # Speed of movement in mm/min
+float64 e # Relative amount of filament in mm
 string printing_command  # Raw gCode like "M82"
 bool has_movement  # True if there is a movement command
 bool has_printing  # True if there is a printing command
+bool has_extrusion # True if there is an extrusion command
 bool is_final # True if it is the final command"""
-  __slots__ = ['seq_id','cmd_id','x','y','z','b','f','printing_command','has_movement','has_printing','is_final']
-  _slot_types = ['int32','int32','float64','float64','float64','float64','float64','string','bool','bool','bool']
+  __slots__ = ['seq_id','cmd_id','x','y','z','b','f','e','printing_command','has_movement','has_printing','has_extrusion','is_final']
+  _slot_types = ['int32','int32','float64','float64','float64','float64','float64','float64','string','bool','bool','bool','bool']
 
   def __init__(self, *args, **kwds):
     """
@@ -34,7 +36,7 @@ bool is_final # True if it is the final command"""
     changes.  You cannot mix in-order arguments and keyword arguments.
 
     The available fields are:
-       seq_id,cmd_id,x,y,z,b,f,printing_command,has_movement,has_printing,is_final
+       seq_id,cmd_id,x,y,z,b,f,e,printing_command,has_movement,has_printing,has_extrusion,is_final
 
     :param args: complete set of field values, in .msg order
     :param kwds: use keyword arguments corresponding to message field names
@@ -57,12 +59,16 @@ bool is_final # True if it is the final command"""
         self.b = 0.
       if self.f is None:
         self.f = 0.
+      if self.e is None:
+        self.e = 0.
       if self.printing_command is None:
         self.printing_command = ''
       if self.has_movement is None:
         self.has_movement = False
       if self.has_printing is None:
         self.has_printing = False
+      if self.has_extrusion is None:
+        self.has_extrusion = False
       if self.is_final is None:
         self.is_final = False
     else:
@@ -73,9 +79,11 @@ bool is_final # True if it is the final command"""
       self.z = 0.
       self.b = 0.
       self.f = 0.
+      self.e = 0.
       self.printing_command = ''
       self.has_movement = False
       self.has_printing = False
+      self.has_extrusion = False
       self.is_final = False
 
   def _get_types(self):
@@ -91,7 +99,7 @@ bool is_final # True if it is the final command"""
     """
     try:
       _x = self
-      buff.write(_get_struct_2i5d().pack(_x.seq_id, _x.cmd_id, _x.x, _x.y, _x.z, _x.b, _x.f))
+      buff.write(_get_struct_2i6d().pack(_x.seq_id, _x.cmd_id, _x.x, _x.y, _x.z, _x.b, _x.f, _x.e))
       _x = self.printing_command
       length = len(_x)
       if python3 or type(_x) == unicode:
@@ -99,7 +107,7 @@ bool is_final # True if it is the final command"""
         length = len(_x)
       buff.write(struct.Struct('<I%ss'%length).pack(length, _x))
       _x = self
-      buff.write(_get_struct_3B().pack(_x.has_movement, _x.has_printing, _x.is_final))
+      buff.write(_get_struct_4B().pack(_x.has_movement, _x.has_printing, _x.has_extrusion, _x.is_final))
     except struct.error as se: self._check_types(struct.error("%s: '%s' when writing '%s'" % (type(se), str(se), str(locals().get('_x', self)))))
     except TypeError as te: self._check_types(ValueError("%s: '%s' when writing '%s'" % (type(te), str(te), str(locals().get('_x', self)))))
 
@@ -114,8 +122,8 @@ bool is_final # True if it is the final command"""
       end = 0
       _x = self
       start = end
-      end += 48
-      (_x.seq_id, _x.cmd_id, _x.x, _x.y, _x.z, _x.b, _x.f,) = _get_struct_2i5d().unpack(str[start:end])
+      end += 56
+      (_x.seq_id, _x.cmd_id, _x.x, _x.y, _x.z, _x.b, _x.f, _x.e,) = _get_struct_2i6d().unpack(str[start:end])
       start = end
       end += 4
       (length,) = _struct_I.unpack(str[start:end])
@@ -127,10 +135,11 @@ bool is_final # True if it is the final command"""
         self.printing_command = str[start:end]
       _x = self
       start = end
-      end += 3
-      (_x.has_movement, _x.has_printing, _x.is_final,) = _get_struct_3B().unpack(str[start:end])
+      end += 4
+      (_x.has_movement, _x.has_printing, _x.has_extrusion, _x.is_final,) = _get_struct_4B().unpack(str[start:end])
       self.has_movement = bool(self.has_movement)
       self.has_printing = bool(self.has_printing)
+      self.has_extrusion = bool(self.has_extrusion)
       self.is_final = bool(self.is_final)
       return self
     except struct.error as e:
@@ -145,7 +154,7 @@ bool is_final # True if it is the final command"""
     """
     try:
       _x = self
-      buff.write(_get_struct_2i5d().pack(_x.seq_id, _x.cmd_id, _x.x, _x.y, _x.z, _x.b, _x.f))
+      buff.write(_get_struct_2i6d().pack(_x.seq_id, _x.cmd_id, _x.x, _x.y, _x.z, _x.b, _x.f, _x.e))
       _x = self.printing_command
       length = len(_x)
       if python3 or type(_x) == unicode:
@@ -153,7 +162,7 @@ bool is_final # True if it is the final command"""
         length = len(_x)
       buff.write(struct.Struct('<I%ss'%length).pack(length, _x))
       _x = self
-      buff.write(_get_struct_3B().pack(_x.has_movement, _x.has_printing, _x.is_final))
+      buff.write(_get_struct_4B().pack(_x.has_movement, _x.has_printing, _x.has_extrusion, _x.is_final))
     except struct.error as se: self._check_types(struct.error("%s: '%s' when writing '%s'" % (type(se), str(se), str(locals().get('_x', self)))))
     except TypeError as te: self._check_types(ValueError("%s: '%s' when writing '%s'" % (type(te), str(te), str(locals().get('_x', self)))))
 
@@ -169,8 +178,8 @@ bool is_final # True if it is the final command"""
       end = 0
       _x = self
       start = end
-      end += 48
-      (_x.seq_id, _x.cmd_id, _x.x, _x.y, _x.z, _x.b, _x.f,) = _get_struct_2i5d().unpack(str[start:end])
+      end += 56
+      (_x.seq_id, _x.cmd_id, _x.x, _x.y, _x.z, _x.b, _x.f, _x.e,) = _get_struct_2i6d().unpack(str[start:end])
       start = end
       end += 4
       (length,) = _struct_I.unpack(str[start:end])
@@ -182,10 +191,11 @@ bool is_final # True if it is the final command"""
         self.printing_command = str[start:end]
       _x = self
       start = end
-      end += 3
-      (_x.has_movement, _x.has_printing, _x.is_final,) = _get_struct_3B().unpack(str[start:end])
+      end += 4
+      (_x.has_movement, _x.has_printing, _x.has_extrusion, _x.is_final,) = _get_struct_4B().unpack(str[start:end])
       self.has_movement = bool(self.has_movement)
       self.has_printing = bool(self.has_printing)
+      self.has_extrusion = bool(self.has_extrusion)
       self.is_final = bool(self.is_final)
       return self
     except struct.error as e:
@@ -195,15 +205,15 @@ _struct_I = genpy.struct_I
 def _get_struct_I():
     global _struct_I
     return _struct_I
-_struct_2i5d = None
-def _get_struct_2i5d():
-    global _struct_2i5d
-    if _struct_2i5d is None:
-        _struct_2i5d = struct.Struct("<2i5d")
-    return _struct_2i5d
-_struct_3B = None
-def _get_struct_3B():
-    global _struct_3B
-    if _struct_3B is None:
-        _struct_3B = struct.Struct("<3B")
-    return _struct_3B
+_struct_2i6d = None
+def _get_struct_2i6d():
+    global _struct_2i6d
+    if _struct_2i6d is None:
+        _struct_2i6d = struct.Struct("<2i6d")
+    return _struct_2i6d
+_struct_4B = None
+def _get_struct_4B():
+    global _struct_4B
+    if _struct_4B is None:
+        _struct_4B = struct.Struct("<4B")
+    return _struct_4B

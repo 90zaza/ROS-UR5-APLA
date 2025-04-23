@@ -75,13 +75,13 @@ if __name__ == '__main__':
     pose_goal = geometry_msgs.msg.Pose()
     pose_goal.position.x = 0.2
     pose_goal.position.y = 0.06
-    pose_goal.position.z = 0
+    pose_goal.position.z = 0.2
 
     #For world frame
     # quaternion = quaternion_from_euler(pi, 0, 0)
 
     #For buildPlate frame
-    quaternion = quaternion_from_euler(pi, 0, pi)
+    quaternion = quaternion_from_euler(pi, -0.24498, pi)
 
     pose_goal.orientation.x = quaternion[0]
     pose_goal.orientation.y = quaternion[1]

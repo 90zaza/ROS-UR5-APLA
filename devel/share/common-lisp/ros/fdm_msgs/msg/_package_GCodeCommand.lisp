@@ -13,12 +13,16 @@
           B
           F-VAL
           F
+          E-VAL
+          E
           PRINTING_COMMAND-VAL
           PRINTING_COMMAND
           HAS_MOVEMENT-VAL
           HAS_MOVEMENT
           HAS_PRINTING-VAL
           HAS_PRINTING
+          HAS_EXTRUSION-VAL
+          HAS_EXTRUSION
           IS_FINAL-VAL
           IS_FINAL
 ))

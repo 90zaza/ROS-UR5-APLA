@@ -31,9 +31,11 @@ struct GCodeCommand_
     , z(0.0)
     , b(0.0)
     , f(0.0)
+    , e(0.0)
     , printing_command()
     , has_movement(false)
     , has_printing(false)
+    , has_extrusion(false)
     , is_final(false)  {
     }
   GCodeCommand_(const ContainerAllocator& _alloc)
@@ -44,9 +46,11 @@ struct GCodeCommand_
     , z(0.0)
     , b(0.0)
     , f(0.0)
+    , e(0.0)
     , printing_command(_alloc)
     , has_movement(false)
     , has_printing(false)
+    , has_extrusion(false)
     , is_final(false)  {
   (void)_alloc;
     }
@@ -74,6 +78,9 @@ struct GCodeCommand_
    typedef double _f_type;
   _f_type f;
 
+   typedef double _e_type;
+  _e_type e;
+
    typedef std::basic_string<char, std::char_traits<char>, typename std::allocator_traits<ContainerAllocator>::template rebind_alloc<char>> _printing_command_type;
   _printing_command_type printing_command;
 
@@ -82,6 +89,9 @@ struct GCodeCommand_
 
    typedef uint8_t _has_printing_type;
   _has_printing_type has_printing;
+
+   typedef uint8_t _has_extrusion_type;
+  _has_extrusion_type has_extrusion;
 
    typedef uint8_t _is_final_type;
   _is_final_type is_final;
@@ -122,9 +132,11 @@ bool operator==(const ::fdm_msgs::GCodeCommand_<ContainerAllocator1> & lhs, cons
     lhs.z == rhs.z &&
     lhs.b == rhs.b &&
     lhs.f == rhs.f &&
+    lhs.e == rhs.e &&
     lhs.printing_command == rhs.printing_command &&
     lhs.has_movement == rhs.has_movement &&
     lhs.has_printing == rhs.has_printing &&
+    lhs.has_extrusion == rhs.has_extrusion &&
     lhs.is_final == rhs.is_final;
 }
 
@@ -182,12 +194,12 @@ struct MD5Sum< ::fdm_msgs::GCodeCommand_<ContainerAllocator> >
 {
   static const char* value()
   {
-    return "a9792c73d889e17713210aba8d6352d6";
+    return "352c65e2dbd785cfb0a63fed83c40bb7";
   }
 
   static const char* value(const ::fdm_msgs::GCodeCommand_<ContainerAllocator>&) { return value(); }
-  static const uint64_t static_value1 = 0xa9792c73d889e177ULL;
-  static const uint64_t static_value2 = 0x13210aba8d6352d6ULL;
+  static const uint64_t static_value1 = 0x352c65e2dbd785cfULL;
+  static const uint64_t static_value2 = 0xb0a63fed83c40bb7ULL;
 };
 
 template<class ContainerAllocator>
@@ -213,10 +225,12 @@ struct Definition< ::fdm_msgs::GCodeCommand_<ContainerAllocator> >
 "float64 y # Position in mm\n"
 "float64 z # Position in mm\n"
 "float64 b # Orientation in rad\n"
-"float64 f  # Speed of movement in mm/min\n"
+"float64 f # Speed of movement in mm/min\n"
+"float64 e # Relative amount of filament in mm\n"
 "string printing_command  # Raw gCode like \"M82\"\n"
 "bool has_movement  # True if there is a movement command\n"
 "bool has_printing  # True if there is a printing command\n"
+"bool has_extrusion # True if there is an extrusion command\n"
 "bool is_final # True if it is the final command\n"
 ;
   }
@@ -243,9 +257,11 @@ namespace serialization
       stream.next(m.z);
       stream.next(m.b);
       stream.next(m.f);
+      stream.next(m.e);
       stream.next(m.printing_command);
       stream.next(m.has_movement);
       stream.next(m.has_printing);
+      stream.next(m.has_extrusion);
       stream.next(m.is_final);
     }
 
@@ -279,12 +295,16 @@ struct Printer< ::fdm_msgs::GCodeCommand_<ContainerAllocator> >
     Printer<double>::stream(s, indent + "  ", v.b);
     s << indent << "f: ";
     Printer<double>::stream(s, indent + "  ", v.f);
+    s << indent << "e: ";
+    Printer<double>::stream(s, indent + "  ", v.e);
     s << indent << "printing_command: ";
     Printer<std::basic_string<char, std::char_traits<char>, typename std::allocator_traits<ContainerAllocator>::template rebind_alloc<char>>>::stream(s, indent + "  ", v.printing_command);
     s << indent << "has_movement: ";
     Printer<uint8_t>::stream(s, indent + "  ", v.has_movement);
     s << indent << "has_printing: ";
     Printer<uint8_t>::stream(s, indent + "  ", v.has_printing);
+    s << indent << "has_extrusion: ";
+    Printer<uint8_t>::stream(s, indent + "  ", v.has_extrusion);
     s << indent << "is_final: ";
     Printer<uint8_t>::stream(s, indent + "  ", v.is_final);
   }

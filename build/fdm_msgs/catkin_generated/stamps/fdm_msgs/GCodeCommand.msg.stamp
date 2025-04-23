@@ -5,8 +5,10 @@ float64 x # Position in mm
 float64 y # Position in mm
 float64 z # Position in mm
 float64 b # Orientation in rad
-float64 f  # Speed of movement in mm/min
+float64 f # Speed of movement in mm/min
+float64 e # Relative amount of filament in mm
 string printing_command  # Raw gCode like "M82"
 bool has_movement  # True if there is a movement command
 bool has_printing  # True if there is a printing command
+bool has_extrusion # True if there is an extrusion command
 bool is_final # True if it is the final command

@@ -25,9 +25,11 @@ class GCodeCommand {
       this.z = null;
       this.b = null;
       this.f = null;
+      this.e = null;
       this.printing_command = null;
       this.has_movement = null;
       this.has_printing = null;
+      this.has_extrusion = null;
       this.is_final = null;
     }
     else {
@@ -73,6 +75,12 @@ class GCodeCommand {
       else {
         this.f = 0.0;
       }
+      if (initObj.hasOwnProperty('e')) {
+        this.e = initObj.e
+      }
+      else {
+        this.e = 0.0;
+      }
       if (initObj.hasOwnProperty('printing_command')) {
         this.printing_command = initObj.printing_command
       }
@@ -90,6 +98,12 @@ class GCodeCommand {
       }
       else {
         this.has_printing = false;
+      }
+      if (initObj.hasOwnProperty('has_extrusion')) {
+        this.has_extrusion = initObj.has_extrusion
+      }
+      else {
+        this.has_extrusion = false;
       }
       if (initObj.hasOwnProperty('is_final')) {
         this.is_final = initObj.is_final
@@ -116,12 +130,16 @@ class GCodeCommand {
     bufferOffset = _serializer.float64(obj.b, buffer, bufferOffset);
     // Serialize message field [f]
     bufferOffset = _serializer.float64(obj.f, buffer, bufferOffset);
+    // Serialize message field [e]
+    bufferOffset = _serializer.float64(obj.e, buffer, bufferOffset);
     // Serialize message field [printing_command]
     bufferOffset = _serializer.string(obj.printing_command, buffer, bufferOffset);
     // Serialize message field [has_movement]
     bufferOffset = _serializer.bool(obj.has_movement, buffer, bufferOffset);
     // Serialize message field [has_printing]
     bufferOffset = _serializer.bool(obj.has_printing, buffer, bufferOffset);
+    // Serialize message field [has_extrusion]
+    bufferOffset = _serializer.bool(obj.has_extrusion, buffer, bufferOffset);
     // Serialize message field [is_final]
     bufferOffset = _serializer.bool(obj.is_final, buffer, bufferOffset);
     return bufferOffset;
@@ -145,12 +163,16 @@ class GCodeCommand {
     data.b = _deserializer.float64(buffer, bufferOffset);
     // Deserialize message field [f]
     data.f = _deserializer.float64(buffer, bufferOffset);
+    // Deserialize message field [e]
+    data.e = _deserializer.float64(buffer, bufferOffset);
     // Deserialize message field [printing_command]
     data.printing_command = _deserializer.string(buffer, bufferOffset);
     // Deserialize message field [has_movement]
     data.has_movement = _deserializer.bool(buffer, bufferOffset);
     // Deserialize message field [has_printing]
     data.has_printing = _deserializer.bool(buffer, bufferOffset);
+    // Deserialize message field [has_extrusion]
+    data.has_extrusion = _deserializer.bool(buffer, bufferOffset);
     // Deserialize message field [is_final]
     data.is_final = _deserializer.bool(buffer, bufferOffset);
     return data;
@@ -159,7 +181,7 @@ class GCodeCommand {
   static getMessageSize(object) {
     let length = 0;
     length += _getByteLength(object.printing_command);
-    return length + 55;
+    return length + 64;
   }
 
   static datatype() {
@@ -169,7 +191,7 @@ class GCodeCommand {
 
   static md5sum() {
     //Returns md5sum for a message object
-    return 'a9792c73d889e17713210aba8d6352d6';
+    return '352c65e2dbd785cfb0a63fed83c40bb7';
   }
 
   static messageDefinition() {
@@ -182,10 +204,12 @@ class GCodeCommand {
     float64 y # Position in mm
     float64 z # Position in mm
     float64 b # Orientation in rad
-    float64 f  # Speed of movement in mm/min
+    float64 f # Speed of movement in mm/min
+    float64 e # Relative amount of filament in mm
     string printing_command  # Raw gCode like "M82"
     bool has_movement  # True if there is a movement command
     bool has_printing  # True if there is a printing command
+    bool has_extrusion # True if there is an extrusion command
     bool is_final # True if it is the final command
     `;
   }
@@ -245,6 +269,13 @@ class GCodeCommand {
       resolved.f = 0.0
     }
 
+    if (msg.e !== undefined) {
+      resolved.e = msg.e;
+    }
+    else {
+      resolved.e = 0.0
+    }
+
     if (msg.printing_command !== undefined) {
       resolved.printing_command = msg.printing_command;
     }
@@ -264,6 +295,13 @@ class GCodeCommand {
     }
     else {
       resolved.has_printing = false
+    }
+
+    if (msg.has_extrusion !== undefined) {
+      resolved.has_extrusion = msg.has_extrusion;
+    }
+    else {
+      resolved.has_extrusion = false
     }
 
     if (msg.is_final !== undefined) {
