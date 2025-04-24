@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import rospy
+import moveit_msgs.msg
 import std_msgs.msg
 import fdm_msgs.msg
 import sys
@@ -30,6 +31,7 @@ class Communication:
         rospy.Subscriber("gcode_command", fdm_msgs.msg.GCodeCommand, self.toolpathPlanner.gcodeCommands)
         rospy.Subscriber("movement_plan_response", fdm_msgs.msg.MovementPlan, self.toolpathPlanner.movementPlanConcatenater)
         rospy.Subscriber("duet_response", std_msgs.msg.String, self.executer.receivedCommand)
+        rospy.Subscriber("execute_trajectory/feedback", moveit_msgs.msg.ExecuteTrajectoryActionFeedback, self.executer.receivedStartingTime)
 
         return
 
@@ -213,6 +215,8 @@ class Executer:
         self.comms = comms
         self.response_event = threading.Event()
         self.latest_response = None
+        self.startingTime = None
+        self.receivedNewStartingTime = False
 
     def mainLoop(self, gcodeCommandList, movementPlanList):
         cmdCounter = 0
@@ -227,7 +231,7 @@ class Executer:
             if gcodeCommandList[cmdCounter].has_movement:
                 print(f'Executing movementPlanList[{mvmCounter}]')
                 self.comms.publish_movement_execution(movementPlanList[mvmCounter])
-                startOfMovement = rospy.get_rostime()
+                # startOfMovement = rospy.get_rostime()
 
                 for i in range(len(movementPlanList[mvmCounter].timestamps)):
                     if gcodeCommandList[cmdCounter].has_extrusion:
@@ -239,11 +243,15 @@ class Executer:
                     else:
                         exec_time = movementPlanList[mvmCounter].timestamps[i] - movementPlanList[mvmCounter].timestamps[i-1]
                     
+                    while self.receivedNewStartingTime == False:
+                        rospy.sleep(1)
+
                     currentTime = rospy.get_rostime()
-                    rospy.sleep(startOfMovement + movementPlanList[mvmCounter].timestamps[i] - currentTime)
-                    print(f'[{startOfMovement.secs}.{startOfMovement.nsecs}] Calculated time: {exec_time} vs. timeSlept: {startOfMovement + movementPlanList[mvmCounter].timestamps[i] - currentTime}')
+                    rospy.sleep(self.startingTime + movementPlanList[mvmCounter].timestamps[i] - currentTime)
+                    print(f'[{self.startingTime.secs}.{self.startingTime.nsecs}] Calculated time: {exec_time} vs. timeSlept: {self.startingTime + movementPlanList[mvmCounter].timestamps[i] - currentTime}')
                     cmdCounter += 1
                 mvmCounter += 1
+                self.receivedNewStartingTime = False
 
                 print(f'This was the total time for this movementPlanList: {movementPlanList[mvmCounter-1].timestamps[-1]}')
 
@@ -274,6 +282,17 @@ class Executer:
         rospy.loginfo(f"Received response: {msg.data}")
         self.response_event.set()
         return
+    
+    def receivedStartingTime(self, msg):
+        # rospy.loginfo(msg)
+        if msg.status.status == 1:
+            self.startingTime = rospy.Time(msg.status.goal_id.stamp.secs, msg.status.goal_id.stamp.nsecs)
+            self.receivedNewStartingTime = True
+        # rospy.loginfo(f'Received {msg}!')
+        # rospy.loginfo(f'{msg.status.goal_id.stamp.secs}.{msg.status.goal_id.stamp.nsecs} seconds')
+        # rospy.loginfo(f'Status: {msg.status.status}, with type {type(msg.status.status)}')
+        return
+
 
 def main():
     rospy.init_node('main', anonymous=True)
