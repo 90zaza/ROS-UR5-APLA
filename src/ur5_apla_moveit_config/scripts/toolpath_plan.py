@@ -119,10 +119,12 @@ class ToolpathPlanner:
             self.pose_goal.position.z = cmd.z * 0.001
         if not math.isnan(cmd.b):
             self.quaternion = quaternion_from_euler(pi, cmd.b, pi)
+            # print(f'The received b value is: {cmd.b}')
             self.pose_goal.orientation.x = self.quaternion[0]
             self.pose_goal.orientation.y = self.quaternion[1]
             self.pose_goal.orientation.z = self.quaternion[2]
             self.pose_goal.orientation.w = self.quaternion[3]
+            # print(f'Which gives this orientation: {self.pose_goal.orientation}')
 
         self.movementPlanMSG.seq_id = cmd.seq_id
         self.computePlanPose()

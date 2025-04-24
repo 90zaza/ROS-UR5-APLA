@@ -99,6 +99,7 @@ class GCodeInterpreter:
             gcodeCommand_msg.x = self.x_value
             gcodeCommand_msg.y = self.y_value
             gcodeCommand_msg.z = self.z_value
+            gcodeCommand_msg.b = self.b_value
             gcodeCommand_msg.f = self.f_value
             gcodeCommand_msg.e = self.e_value
 

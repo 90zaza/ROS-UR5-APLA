@@ -149,6 +149,29 @@ class ToolpathPlanner:
 
         return grouped_seq_ids
     
+    def calculateGCodeExtrusionTime(self):
+        cmdCounter = 0
+        mvmCounter = 0
+        while cmdCounter < len(self.gcodeCommandList):
+            if self.gcodeCommandList[cmdCounter].is_final:
+                return
+            if self.gcodeCommandList[cmdCounter].has_movement:
+                for i in range(len(self.movementPlanConsecList[mvmCounter].timestamps)):
+                    if i == 0:
+                        exec_time = self.movementPlanConsecList[mvmCounter].timestamps[i]
+                    else:
+                        exec_time = self.movementPlanConsecList[mvmCounter].timestamps[i] - self.movementPlanConsecList[mvmCounter].timestamps[i-1]
+                    if self.gcodeCommandList[cmdCounter].has_extrusion:
+                        exec_time_mins = exec_time.to_sec() / 60
+                        f = abs(self.gcodeCommandList[cmdCounter].e / exec_time_mins)
+                        cmd = f"G1 F{f:.5f} E{self.gcodeCommandList[cmdCounter].e:.5f}"
+                        self.gcodeCommandList[cmdCounter].printing_command = cmd
+                    cmdCounter += 1
+                mvmCounter += 1
+            cmdCounter += 1
+        return
+
+    
     def movementPlanConcatenater(self, movementPlan):
         self.countedMovementCommands += 1
         index = self.sequentialMovementCommandsIndices[movementPlan.seq_id]
@@ -170,6 +193,7 @@ class ToolpathPlanner:
                 last_time = mvmPlan.trajectory.joint_trajectory.points[-1].time_from_start
                 self.movementPlanConsecList[index[0]].timestamps.append(last_time)
                 self.movementPlanConsecList[index[0]].trajectory.joint_trajectory.points.extend(mvmPlan.trajectory.joint_trajectory.points[1:])
+                # self.movementPlanConsecList[index[0]].trajectory.joint_trajectory.points.extend(mvmPlan.trajectory.joint_trajectory.points)
                 if not self.movementPlanConsecList[index[0]].trajectory.joint_trajectory.joint_names:
                     self.movementPlanConsecList[index[0]].trajectory.joint_trajectory.joint_names = mvmPlan.trajectory.joint_trajectory.joint_names
             # last_time = self.movementPlanList[index[0]][-1].trajectory.joint_trajectory.points[-1].time_from_start
@@ -178,6 +202,8 @@ class ToolpathPlanner:
             self.movementPlanConsecList[index[0]].seq_ids = self.sequentialMovementCommands[index[0]]
 
         if self.totalMovementCommands == self.countedMovementCommands:
+            self.calculateGCodeExtrusionTime()
+
             input("Everything seems to be ready for execution, press Enter to continue.")
             self.executer.mainLoop(self.gcodeCommandList, self.movementPlanConsecList)
         return
@@ -198,37 +224,28 @@ class Executer:
                 finalCMD.seq_ids = [-1]
                 self.comms.publish_movement_execution(finalCMD)
                 return
-            # if gcodeCommandList[cmdCounter].has_movement:
-            #     print(f'Executing movementPlanList[{mvmCounter}]')
-            #     self.comms.publish_movement_execution(movementPlanList[mvmCounter])
-                    
-            #     for i in range(len(movementPlanList[mvmCounter].timestamps)):
-            #         print(f'Sending gcodeCommand {gcodeCommandList[cmdCounter].printing_command}')
-            #         self.comms.publish_duet_request(gcodeCommandList[cmdCounter])
-            #         cmdCounter += 1
-            #         if i == 0:
-            #             rospy.sleep(movementPlanList[mvmCounter].timestamps[i])
-            #         rospy.sleep(movementPlanList[mvmCounter].timestamps[i] - movementPlanList[mvmCounter].timestamps[i-1])
-            #     mvmCounter += 1
             if gcodeCommandList[cmdCounter].has_movement:
                 print(f'Executing movementPlanList[{mvmCounter}]')
                 self.comms.publish_movement_execution(movementPlanList[mvmCounter])
+                startOfMovement = rospy.get_rostime()
 
                 for i in range(len(movementPlanList[mvmCounter].timestamps)):
-                    if i == 0:
-                        rospy.sleep(movementPlanList[mvmCounter].timestamps[i])
-                    exec_time = movementPlanList[mvmCounter].timestamps[i] - movementPlanList[mvmCounter].timestamps[i-1]
                     if gcodeCommandList[cmdCounter].has_extrusion:
-                        # print(f'Current e {gcodeCommandList[cmdCounter].e}, timestamp[i]: {movementPlanList[mvmCounter].timestamps[i]}, timesetamp[i-1]: {movementPlanList[mvmCounter].timestamps[i-1]}, current exec_time: {exec_time}')
-                        exec_time_mins = exec_time.to_sec() / 60
-                        f = gcodeCommandList[cmdCounter].e / exec_time_mins
-                        cmd = f"G1 F{f:.5f} E{gcodeCommandList[cmdCounter].e:.5f}"
-                        gcodeCommandList[cmdCounter].printing_command = cmd
-                        print(f'Sending gcodeCommand: {cmd}')
                         self.comms.publish_duet_request(gcodeCommandList[cmdCounter])
-                    rospy.sleep(exec_time)
+                        print(f'Sending gcodeCommand: {gcodeCommandList[cmdCounter].printing_command}')
+
+                    if i == 0:
+                        exec_time = movementPlanList[mvmCounter].timestamps[i]
+                    else:
+                        exec_time = movementPlanList[mvmCounter].timestamps[i] - movementPlanList[mvmCounter].timestamps[i-1]
+                    
+                    currentTime = rospy.get_rostime()
+                    rospy.sleep(startOfMovement + movementPlanList[mvmCounter].timestamps[i] - currentTime)
+                    print(f'[{startOfMovement.secs}.{startOfMovement.nsecs}] Calculated time: {exec_time} vs. timeSlept: {startOfMovement + movementPlanList[mvmCounter].timestamps[i] - currentTime}')
                     cmdCounter += 1
                 mvmCounter += 1
+
+                print(f'This was the total time for this movementPlanList: {movementPlanList[mvmCounter-1].timestamps[-1]}')
 
             print(f'Sending gcodeCommand {gcodeCommandList[cmdCounter].printing_command}')
             self.comms.publish_duet_request(gcodeCommandList[cmdCounter])
