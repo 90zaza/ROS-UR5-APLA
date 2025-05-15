@@ -165,6 +165,8 @@ class ToolpathPlanner:
                         exec_time = self.movementPlanConsecList[mvmCounter].timestamps[i] - self.movementPlanConsecList[mvmCounter].timestamps[i-1]
                     if self.gcodeCommandList[cmdCounter].has_extrusion:
                         exec_time_mins = exec_time.to_sec() / 60
+                        # print(f'exec_time: {exec_time}, exec_time_mins: {exec_time_mins}, i: {i}, timestamps[i]: {self.movementPlanConsecList[mvmCounter].timestamps[i]}')
+                        # print(f'gCode: {self.gcodeCommandList[cmdCounter]}')
                         f = abs(self.gcodeCommandList[cmdCounter].e / exec_time_mins)
                         cmd = f"G1 F{f:.5f} E{self.gcodeCommandList[cmdCounter].e:.5f}"
                         self.gcodeCommandList[cmdCounter].printing_command = cmd
@@ -238,22 +240,22 @@ class Executer:
                         self.comms.publish_duet_request(gcodeCommandList[cmdCounter])
                         print(f'Sending gcodeCommand: {gcodeCommandList[cmdCounter].printing_command}')
 
-                    if i == 0:
-                        exec_time = movementPlanList[mvmCounter].timestamps[i]
-                    else:
-                        exec_time = movementPlanList[mvmCounter].timestamps[i] - movementPlanList[mvmCounter].timestamps[i-1]
+                    # if i == 0:
+                    #     exec_time = movementPlanList[mvmCounter].timestamps[i]
+                    # else:
+                    #     exec_time = movementPlanList[mvmCounter].timestamps[i] - movementPlanList[mvmCounter].timestamps[i-1]
                     
                     while self.receivedNewStartingTime == False:
                         rospy.sleep(1)
 
                     currentTime = rospy.get_rostime()
                     rospy.sleep(self.startingTime + movementPlanList[mvmCounter].timestamps[i] - currentTime)
-                    print(f'[{self.startingTime.secs}.{self.startingTime.nsecs}] Calculated time: {exec_time} vs. timeSlept: {self.startingTime + movementPlanList[mvmCounter].timestamps[i] - currentTime}')
+                    # print(f'[{self.startingTime.secs}.{self.startingTime.nsecs}] Calculated time: {exec_time} vs. timeSlept: {self.startingTime + movementPlanList[mvmCounter].timestamps[i] - currentTime}')
                     cmdCounter += 1
                 mvmCounter += 1
                 self.receivedNewStartingTime = False
 
-                print(f'This was the total time for this movementPlanList: {movementPlanList[mvmCounter-1].timestamps[-1]}')
+                # print(f'This was the total time for this movementPlanList: {movementPlanList[mvmCounter-1].timestamps[-1]}')
 
             print(f'Sending gcodeCommand {gcodeCommandList[cmdCounter].printing_command}')
             self.comms.publish_duet_request(gcodeCommandList[cmdCounter])
@@ -286,8 +288,8 @@ class Executer:
     def receivedStartingTime(self, msg):
         # rospy.loginfo(msg)
         if msg.status.status == 1:
-            self.startingTime = rospy.Time(msg.status.goal_id.stamp.secs, msg.status.goal_id.stamp.nsecs)
-            self.receivedNewStartingTime = True
+            self.startingTime, self.receivedNewStartingTime = rospy.Time(msg.status.goal_id.stamp.secs, msg.status.goal_id.stamp.nsecs), True
+            # self.receivedNewStartingTime = True
         # rospy.loginfo(f'Received {msg}!')
         # rospy.loginfo(f'{msg.status.goal_id.stamp.secs}.{msg.status.goal_id.stamp.nsecs} seconds')
         # rospy.loginfo(f'Status: {msg.status.status}, with type {type(msg.status.status)}')

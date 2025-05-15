@@ -71,17 +71,23 @@ if __name__ == '__main__':
     # wpose.position.x += 0.15
     # waypoints.append(copy.deepcopy(wpose))
 
+    # G1 X100 Y60.9 Z0.225 B-0.87194 E0.05088 (50 degree)
+    # G1 X100.476 Y60.9 Z10.275 B-1.0459 (60 degree)
+    # G1 X100.401 Y60 Z0.47 B-1.22204 E0.06308 (70 degree)
+    # G1 X100.545 Y60 Z0.061 B-1.39623 E0.1302 (80 degree)
+    # G1 X100.545 Y60 Z0.061 B-1.57080 E0.1302 (80 degree)
+
     # Planning for two points
     pose_goal = geometry_msgs.msg.Pose()
-    pose_goal.position.x = 0.2
-    pose_goal.position.y = 0.06
-    pose_goal.position.z = 0.2
+    pose_goal.position.x = 0.100
+    pose_goal.position.y = 0.060
+    pose_goal.position.z = 0.05
 
     #For world frame
     # quaternion = quaternion_from_euler(pi, 0, 0)
 
     #For buildPlate frame
-    quaternion = quaternion_from_euler(pi, -0.24498, pi)
+    quaternion = quaternion_from_euler(pi, -1.57080, pi)
 
     pose_goal.orientation.x = quaternion[0]
     pose_goal.orientation.y = quaternion[1]

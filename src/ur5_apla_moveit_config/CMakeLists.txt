@@ -20,3 +20,6 @@ catkin_install_python(PROGRAMS scripts/z-calibration.py
 catkin_install_python(PROGRAMS scripts/singlePose.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
+catkin_install_python(PROGRAMS scripts/toolpath_plan_new.py
+  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)

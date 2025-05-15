@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 import rospy
 import copy
 import json
@@ -56,9 +56,10 @@ class ToolpathPlanner:
         self.psi = mc.PlanningSceneInterface()
         self.move_group = mc.MoveGroupCommander('manipulator')
 
+        self.speed = 18000 #mm/min
         self.move_group.set_pose_reference_frame('buildPlate')
-        self.move_group.limit_max_cartesian_link_speed(0.3, link_name='tcp')
-        self.move_group.set_max_acceleration_scaling_factor(0.05)
+        self.move_group.limit_max_cartesian_link_speed(self.speed * 1.66666667e-5, link_name='tcp')
+        self.move_group.set_max_acceleration_scaling_factor(1)
 
         # initialize "Home" position robotic arm, in frame 'buildPlate'
         self.pose_goal = geometry_msgs.msg.Pose()
@@ -99,6 +100,12 @@ class ToolpathPlanner:
 
         return
     
+    def calculateDistance(self, prevPose, newPose):
+        dis = 0
+        for i in range(len(prevPose)):
+            dis +=  (newPose[i] - prevPose[i])**2
+        return dis**(0.5)
+    
     def goToHome(self):
         self.joint_state.position = [1.5708, -1.5708, 1.5708, 4.7124, 4.7124, 0]
         self.move_group.go(copy.deepcopy(self.joint_state))
@@ -106,11 +113,13 @@ class ToolpathPlanner:
         return
 
     def robotPosition(self, cmd):
+        prevPose = [self.pose_goal.position.x, self.pose_goal.position.y, self.pose_goal.position.z]
         if cmd.is_final:
             self.showPlan()
             return
         if not math.isnan(cmd.f):
-            self.move_group.limit_max_cartesian_link_speed(cmd.f * 1.66666667e-5, link_name='tcp')
+            self.speed = cmd.f
+            self.move_group.limit_max_cartesian_link_speed(self.speed * 1.66666667e-5, link_name='tcp')
         if not math.isnan(cmd.x):
             self.pose_goal.position.x = cmd.x * 0.001
         if not math.isnan(cmd.y):
@@ -119,27 +128,40 @@ class ToolpathPlanner:
             self.pose_goal.position.z = cmd.z * 0.001
         if not math.isnan(cmd.b):
             self.quaternion = quaternion_from_euler(pi, cmd.b, pi)
-            # print(f'The received b value is: {cmd.b}')
             self.pose_goal.orientation.x = self.quaternion[0]
             self.pose_goal.orientation.y = self.quaternion[1]
             self.pose_goal.orientation.z = self.quaternion[2]
             self.pose_goal.orientation.w = self.quaternion[3]
-            # print(f'Which gives this orientation: {self.pose_goal.orientation}')
+
+        newPose = [self.pose_goal.position.x, self.pose_goal.position.y, self.pose_goal.position.z]
 
         self.movementPlanMSG.seq_id = cmd.seq_id
-        self.computePlanPose()
+
+        dis = self.calculateDistance(prevPose, newPose)
+        expecTime = dis / (self.speed * 1.66666667e-5)
+
+        diff = self.computePlanPose(expecTime)
+        if diff < 50 or diff > 150:
+            self.move_group.limit_max_cartesian_link_speed(self.speed * (diff/100) * 1.66666667e-5, link_name='tcp')
+            diff = (self.computePlanPose(expecTime))
+            self.move_group.limit_max_cartesian_link_speed(self.speed * 1.66666667e-5, link_name='tcp')
+        self.setStartState()
         return
 
-    def computePlanPose(self):
+    def computePlanPose(self, expecTime):
         (self.plan, self.fraction) = self.move_group.compute_cartesian_path(
                                        [copy.deepcopy(self.pose_goal)],
-                                       0.0005,
+                                       0.0001,
                                        False)
         self.movementPlanMSG.trajectory = self.plan
         self.movementPlanMSG.execution_time = self.plan.joint_trajectory.points[-1].time_from_start
         self.comms.publish_toolpath_plan(self.movementPlanMSG)
-        self.setStartState()
-        return
+
+        diff = (self.movementPlanMSG.execution_time.to_sec() / expecTime) * 100
+
+        print(f'For {self.movementPlanMSG.seq_id} we have a execTime of {self.movementPlanMSG.execution_time.to_sec()}, te expecTime was {expecTime}. This is a difference of {diff:.2f}%')
+
+        return diff
         
     def setStartState(self):
         self.latest_joint_positions = copy.deepcopy(self.plan).joint_trajectory.points[-1].positions

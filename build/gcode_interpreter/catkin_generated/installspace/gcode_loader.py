@@ -70,9 +70,7 @@ class GCodeInterpreter:
                 continue
             
             parameters = command.split()
-            print(f'parameters {parameters}')
-            printing_command = []
-            print(f'printing_command {printing_command}')
+            printing_command = command
             hasF = False
 
             for param in parameters:
@@ -95,31 +93,26 @@ class GCodeInterpreter:
                     if float(param[1:]) != 0:
                         self.e_value = float(param[1:])
                         gcodeCommand_msg.has_extrusion = True
-                elif param == "G1":
-                    continue
-                else:
-                    printing_command.append(param)
+                # else:
+                #     printing_command.append(param)
 
             gcodeCommand_msg.x = self.x_value
             gcodeCommand_msg.y = self.y_value
             gcodeCommand_msg.z = self.z_value
+            gcodeCommand_msg.b = self.b_value
             gcodeCommand_msg.f = self.f_value
             gcodeCommand_msg.e = self.e_value
 
-            self.e_value = math.nan
-
             if len(printing_command) > 0:
-                gcodeCommand_msg.printing_command = " ".join(printing_command)
+                # gcodeCommand_msg.printing_command = " ".join(printing_command)
                 # if hasF:
                 #     gcodeCommand_msg.printing_command += " F" + str(gcodeCommand_msg.f)
                 
                 gcodeCommand_msg.has_printing = True
-                # gcodeCommand_msg.printing_command = printing_command
+                gcodeCommand_msg.printing_command = printing_command
             
             self.seq_id += 1
             self.cmd_id += 1
-
-            print(gcodeCommand_msg)
 
             self.comms.publish_gcode_command(gcodeCommand_msg)
         
