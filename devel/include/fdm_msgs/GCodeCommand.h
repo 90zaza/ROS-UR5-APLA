@@ -257,24 +257,44 @@ struct Printer< ::fdm_msgs::GCodeCommand_<ContainerAllocator> >
 {
   template<typename Stream> static void stream(Stream& s, const std::string& indent, const ::fdm_msgs::GCodeCommand_<ContainerAllocator>& v)
   {
+    if (false || !indent.empty())
+      s << std::endl;
     s << indent << "seq_id: ";
     Printer<int32_t>::stream(s, indent + "  ", v.seq_id);
+    if (true || !indent.empty())
+      s << std::endl;
     s << indent << "cmd_id: ";
     Printer<int32_t>::stream(s, indent + "  ", v.cmd_id);
+    if (true || !indent.empty())
+      s << std::endl;
     s << indent << "x: ";
     Printer<double>::stream(s, indent + "  ", v.x);
+    if (true || !indent.empty())
+      s << std::endl;
     s << indent << "y: ";
     Printer<double>::stream(s, indent + "  ", v.y);
+    if (true || !indent.empty())
+      s << std::endl;
     s << indent << "z: ";
     Printer<double>::stream(s, indent + "  ", v.z);
+    if (true || !indent.empty())
+      s << std::endl;
     s << indent << "f: ";
     Printer<double>::stream(s, indent + "  ", v.f);
+    if (true || !indent.empty())
+      s << std::endl;
     s << indent << "printing_command: ";
     Printer<std::basic_string<char, std::char_traits<char>, typename std::allocator_traits<ContainerAllocator>::template rebind_alloc<char>>>::stream(s, indent + "  ", v.printing_command);
+    if (true || !indent.empty())
+      s << std::endl;
     s << indent << "has_movement: ";
     Printer<uint8_t>::stream(s, indent + "  ", v.has_movement);
+    if (true || !indent.empty())
+      s << std::endl;
     s << indent << "has_printing: ";
     Printer<uint8_t>::stream(s, indent + "  ", v.has_printing);
+    if (true || !indent.empty())
+      s << std::endl;
     s << indent << "is_final: ";
     Printer<uint8_t>::stream(s, indent + "  ", v.is_final);
   }
