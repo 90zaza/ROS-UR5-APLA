@@ -260,8 +260,8 @@ struct Definition< ::fdm_msgs::MovementPlanConsec_<ContainerAllocator> >
 "================================================================================\n"
 "MSG: geometry_msgs/Twist\n"
 "# This expresses velocity in free space broken into its linear and angular parts.\n"
-"Vector3  linear\n"
-"Vector3  angular\n"
+"Vector3 linear\n"
+"Vector3 angular\n"
 ;
   }
 
@@ -301,20 +301,39 @@ struct Printer< ::fdm_msgs::MovementPlanConsec_<ContainerAllocator> >
 {
   template<typename Stream> static void stream(Stream& s, const std::string& indent, const ::fdm_msgs::MovementPlanConsec_<ContainerAllocator>& v)
   {
-    s << indent << "seq_ids[]" << std::endl;
+    if (false || !indent.empty())
+      s << std::endl;
+    s << indent << "seq_ids: ";
+    if (v.seq_ids.empty() || true)
+      s << "[";
     for (size_t i = 0; i < v.seq_ids.size(); ++i)
     {
-      s << indent << "  seq_ids[" << i << "]: ";
-      Printer<int32_t>::stream(s, indent + "  ", v.seq_ids[i]);
+      if (true && i > 0)
+        s << ", ";
+      else if (!true)
+        s << std::endl << indent << "  -";
+      Printer<int32_t>::stream(s, true ? std::string() : indent + "    ", v.seq_ids[i]);
     }
-    s << indent << "timestamps[]" << std::endl;
+    if (v.seq_ids.empty() || true)
+      s << "]";
+    if (true || !indent.empty())
+      s << std::endl;
+    s << indent << "timestamps: ";
+    if (v.timestamps.empty() || true)
+      s << "[";
     for (size_t i = 0; i < v.timestamps.size(); ++i)
     {
-      s << indent << "  timestamps[" << i << "]: ";
-      Printer<ros::Duration>::stream(s, indent + "  ", v.timestamps[i]);
+      if (true && i > 0)
+        s << ", ";
+      else if (!true)
+        s << std::endl << indent << "  -";
+      Printer<ros::Duration>::stream(s, true ? std::string() : indent + "    ", v.timestamps[i]);
     }
+    if (v.timestamps.empty() || true)
+      s << "]";
+    if (true || !indent.empty())
+      s << std::endl;
     s << indent << "trajectory: ";
-    s << std::endl;
     Printer< ::moveit_msgs::RobotTrajectory_<ContainerAllocator> >::stream(s, indent + "  ", v.trajectory);
   }
 };

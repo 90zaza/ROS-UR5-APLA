@@ -170,6 +170,7 @@ class ToolpathPlanner:
                         f = abs(self.gcodeCommandList[cmdCounter].e / exec_time_mins)
                         cmd = f"G1 F{f:.5f} E{self.gcodeCommandList[cmdCounter].e:.5f}"
                         self.gcodeCommandList[cmdCounter].printing_command = cmd
+                        print(f'For x: {self.gcodeCommandList[cmdCounter].x} with e: {self.gcodeCommandList[cmdCounter].e} we have a flowrate of {self.gcodeCommandList[cmdCounter].f} mm/min over a duration of {exec_time}')
                     cmdCounter += 1
                 mvmCounter += 1
             cmdCounter += 1

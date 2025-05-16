@@ -260,8 +260,8 @@ struct Definition< ::fdm_msgs::MovementPlan_<ContainerAllocator> >
 "================================================================================\n"
 "MSG: geometry_msgs/Twist\n"
 "# This expresses velocity in free space broken into its linear and angular parts.\n"
-"Vector3  linear\n"
-"Vector3  angular\n"
+"Vector3 linear\n"
+"Vector3 angular\n"
 ;
   }
 
@@ -301,12 +301,17 @@ struct Printer< ::fdm_msgs::MovementPlan_<ContainerAllocator> >
 {
   template<typename Stream> static void stream(Stream& s, const std::string& indent, const ::fdm_msgs::MovementPlan_<ContainerAllocator>& v)
   {
+    if (false || !indent.empty())
+      s << std::endl;
     s << indent << "seq_id: ";
     Printer<int32_t>::stream(s, indent + "  ", v.seq_id);
+    if (true || !indent.empty())
+      s << std::endl;
     s << indent << "execution_time: ";
     Printer<ros::Duration>::stream(s, indent + "  ", v.execution_time);
+    if (true || !indent.empty())
+      s << std::endl;
     s << indent << "trajectory: ";
-    s << std::endl;
     Printer< ::moveit_msgs::RobotTrajectory_<ContainerAllocator> >::stream(s, indent + "  ", v.trajectory);
   }
 };

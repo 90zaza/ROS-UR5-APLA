@@ -185,12 +185,21 @@ struct Printer< ::fdm_msgs::GCode_<ContainerAllocator> >
 {
   template<typename Stream> static void stream(Stream& s, const std::string& indent, const ::fdm_msgs::GCode_<ContainerAllocator>& v)
   {
-    s << indent << "lines[]" << std::endl;
+    if (false || !indent.empty())
+      s << std::endl;
+    s << indent << "lines: ";
+    if (v.lines.empty() || true)
+      s << "[";
     for (size_t i = 0; i < v.lines.size(); ++i)
     {
-      s << indent << "  lines[" << i << "]: ";
-      Printer<std::basic_string<char, std::char_traits<char>, typename std::allocator_traits<ContainerAllocator>::template rebind_alloc<char>>>::stream(s, indent + "  ", v.lines[i]);
+      if (true && i > 0)
+        s << ", ";
+      else if (!true)
+        s << std::endl << indent << "  -";
+      Printer<std::basic_string<char, std::char_traits<char>, typename std::allocator_traits<ContainerAllocator>::template rebind_alloc<char>>>::stream(s, true ? std::string() : indent + "    ", v.lines[i]);
     }
+    if (v.lines.empty() || true)
+      s << "]";
   }
 };
 

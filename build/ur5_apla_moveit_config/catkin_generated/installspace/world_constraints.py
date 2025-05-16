@@ -113,13 +113,13 @@ if __name__ == '__main__':
 
 
     #Ceiling is at 1.80m, workbench is at 0.835m, top plane is located at 1.80 - 0.835 = 0.965m
-    psi.add_plane(
-        name="top_plane", 
-        pose=PoseStamped(
-            header=Header(stamp=rospy.Time.now(), frame_id=robot.get_planning_frame()),
-            pose=Pose(position=Point(x=0, y=0 ,z=0.965), orientation=Quaternion(x=0, y=0, z=0, w=1))),
-        normal=(0,0,1),
-        offset=0)
+    # psi.add_plane(
+    #     name="top_plane", 
+    #     pose=PoseStamped(
+    #         header=Header(stamp=rospy.Time.now(), frame_id=robot.get_planning_frame()),
+    #         pose=Pose(position=Point(x=0, y=0 ,z=0.965), orientation=Quaternion(x=0, y=0, z=0, w=1))),
+    #     normal=(0,0,1),
+    #     offset=0)
     
     # psi.add_plane(
     #     name="left_plane", 
@@ -129,29 +129,29 @@ if __name__ == '__main__':
     #     normal=(0,1,0),
     #     offset=0)
     
-    psi.add_plane(
-        name="right_plane", 
-        pose=PoseStamped(
-            header=Header(stamp=rospy.Time.now(), frame_id=robot.get_planning_frame()),
-            pose=Pose(position=Point(x=0, y=0.78 ,z=0), orientation=Quaternion(x=0, y=0, z=0, w=1))),
-        normal=(0,1,0),
-        offset=0)
+    # psi.add_plane(
+    #     name="right_plane", 
+    #     pose=PoseStamped(
+    #         header=Header(stamp=rospy.Time.now(), frame_id=robot.get_planning_frame()),
+    #         pose=Pose(position=Point(x=0, y=0.78 ,z=0), orientation=Quaternion(x=0, y=0, z=0, w=1))),
+    #     normal=(0,1,0),
+    #     offset=0)
     
-    psi.add_plane(
-        name="back_plane", 
-        pose=PoseStamped(
-            header=Header(stamp=rospy.Time.now(), frame_id=robot.get_planning_frame()),
-            pose=Pose(position=Point(x=-0.35, y=0 ,z=0), orientation=Quaternion(x=0, y=0, z=0, w=1))),
-        normal=(1,0,0),
-        offset=0)
+    # psi.add_plane(
+    #     name="back_plane", 
+    #     pose=PoseStamped(
+    #         header=Header(stamp=rospy.Time.now(), frame_id=robot.get_planning_frame()),
+    #         pose=Pose(position=Point(x=-0.35, y=0 ,z=0), orientation=Quaternion(x=0, y=0, z=0, w=1))),
+    #     normal=(1,0,0),
+    #     offset=0)
     
-    psi.add_plane(
-        name="front_plane", 
-        pose=PoseStamped(
-            header=Header(stamp=rospy.Time.now(), frame_id=robot.get_planning_frame()),
-            pose=Pose(position=Point(x=0.35, y=0 ,z=0), orientation=Quaternion(x=0, y=0, z=0, w=1))),
-        normal=(1,0,0),
-        offset=0)
+    # psi.add_plane(
+    #     name="front_plane", 
+    #     pose=PoseStamped(
+    #         header=Header(stamp=rospy.Time.now(), frame_id=robot.get_planning_frame()),
+    #         pose=Pose(position=Point(x=0.35, y=0 ,z=0), orientation=Quaternion(x=0, y=0, z=0, w=1))),
+    #     normal=(1,0,0),
+    #     offset=0)
     
     rospy.loginfo(psi.get_known_object_names())
     
