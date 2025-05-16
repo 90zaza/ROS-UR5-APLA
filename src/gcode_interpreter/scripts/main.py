@@ -165,12 +165,10 @@ class ToolpathPlanner:
                         exec_time = self.movementPlanConsecList[mvmCounter].timestamps[i] - self.movementPlanConsecList[mvmCounter].timestamps[i-1]
                     if self.gcodeCommandList[cmdCounter].has_extrusion:
                         exec_time_mins = exec_time.to_sec() / 60
-                        # print(f'exec_time: {exec_time}, exec_time_mins: {exec_time_mins}, i: {i}, timestamps[i]: {self.movementPlanConsecList[mvmCounter].timestamps[i]}')
-                        # print(f'gCode: {self.gcodeCommandList[cmdCounter]}')
                         f = abs(self.gcodeCommandList[cmdCounter].e / exec_time_mins)
                         cmd = f"G1 F{f:.5f} E{self.gcodeCommandList[cmdCounter].e:.5f}"
                         self.gcodeCommandList[cmdCounter].printing_command = cmd
-                        print(f'For x: {self.gcodeCommandList[cmdCounter].x} with e: {self.gcodeCommandList[cmdCounter].e} we have a flowrate of {self.gcodeCommandList[cmdCounter].f} mm/min over a duration of {exec_time}')
+                        # print(f'For x: {self.gcodeCommandList[cmdCounter].x} with e: {self.gcodeCommandList[cmdCounter].e} we have a flowrate of {f} mm/min over a duration of {exec_time} nanoseconds')
                     cmdCounter += 1
                 mvmCounter += 1
             cmdCounter += 1
