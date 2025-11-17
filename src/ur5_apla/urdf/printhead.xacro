@@ -20,7 +20,7 @@
       <collision>
         <geometry>
           <!-- The path to the collision meshes in the package. -->
-          <mesh filename="package://ur5_apla/meshes/printhead/collision/printheadv2.stl"/>
+          <mesh filename="package://ur5_apla/meshes/printhead/collision/printheadv2.dae"/>
         </geometry>
       </collision>
     </link>
