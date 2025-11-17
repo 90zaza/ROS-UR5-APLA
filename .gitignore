@@ -1,0 +1,9 @@
+build/
+devel/
+logs/
+*.pyc
+*.swp
+*.swo
+catkin_generated/
+.catkin_tools/
+CMakeCache.txt

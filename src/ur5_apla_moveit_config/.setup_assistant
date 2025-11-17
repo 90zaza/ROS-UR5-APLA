@@ -1,0 +1,11 @@
+moveit_setup_assistant_config:
+  URDF:
+    package: ur5_apla
+    relative_path: urdf/ur5_apla_with_printhead.xacro
+    xacro_args: ""
+  SRDF:
+    relative_path: config/ur5_apla_with_printhead.srdf
+  CONFIG:
+    author_name: Tim Geukers
+    author_email: t.c.geukers@student.tudelft.nl
+    generated_timestamp: 1736245979
