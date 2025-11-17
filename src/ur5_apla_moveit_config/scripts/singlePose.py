@@ -79,15 +79,15 @@ if __name__ == '__main__':
 
     # Planning for two points
     pose_goal = geometry_msgs.msg.Pose()
-    pose_goal.position.x = 0.100
-    pose_goal.position.y = 0.060
-    pose_goal.position.z = 0.05
+    pose_goal.position.x = 0.32 #0.32 for photo
+    pose_goal.position.y = -0.02 #-0.02 for photo
+    pose_goal.position.z = 0.005
 
     #For world frame
     # quaternion = quaternion_from_euler(pi, 0, 0)
 
     #For buildPlate frame
-    quaternion = quaternion_from_euler(pi, -1.57080, pi)
+    quaternion = quaternion_from_euler(pi, 0, pi)
 
     pose_goal.orientation.x = quaternion[0]
     pose_goal.orientation.y = quaternion[1]
