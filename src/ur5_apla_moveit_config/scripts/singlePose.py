@@ -2,6 +2,8 @@
 
 import tf2_ros
 import tf2_geometry_msgs
+import rospkg
+import os
 import sys
 import rospy
 import moveit_commander as mc
@@ -45,7 +47,10 @@ if __name__ == '__main__':
 
     feedback_publisher = rospy.Publisher('/ur5_publisher', std_msgs.msg.String, queue_size=10)
 
-    with open('/home/tim/FDMPrinting/src/ur5_apla_moveit_config/config/calibration.yaml') as f:
+    pkg_path = rospkg.RosPack().get_path('ur5_apla_moveit_config')
+    yaml_path = os.path.join(pkg_path, 'config', 'calibration.yaml')
+
+    with open(yaml_path, 'r') as f:
         doc = yaml.load(f, Loader=yaml.FullLoader)
 
     offset = doc['calibration']['z']
